@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">E-learning Man 5</string>
+    <string name="api_server">http://192.168.1.9:8000/api</string>
+    <string name="title_activity_user">UserActivity</string>
+    <string name="title_home">Tugas</string>
+    <string name="title_dashboard">Profile</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="kelas">KELAS</string>
+    <string name="mata_pelajaran">MATA PELAJARAN</string>
+    <string name="nama_guru">NAMA GURU</string>
+    <string name="download_materi">Download Materi</string>
+    <string name="tugas">Lihat Tugas</string>
+    <string name="deskripsi_materi">Deskripsi Materi</string>
+    <string name="materi">Materi</string>
+    <string name="tanggal_dan_waktu">tanggal dan waktu</string>
+    <string name="logout">LOGOUT</string>
+</resources>
