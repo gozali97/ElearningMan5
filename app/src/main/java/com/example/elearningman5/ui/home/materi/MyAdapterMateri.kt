@@ -58,7 +58,8 @@ class MyAdapterMateri(
         holder.recDownload.setOnClickListener {
             val file = dataList[holder.adapterPosition].getFile()
             if (! file?.isEmpty()!!) {
-                download("http://192.168.1.9:8000/assets/dokumen/$file", file)
+                download(context.getString(R.string.api_server).replace("/api", "/assets/dokumen/$file"), file)
+//                download("http://192.168.1.9:8000/assets/dokumen/$file", file)
             }
         }
 

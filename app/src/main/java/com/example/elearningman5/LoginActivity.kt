@@ -42,8 +42,11 @@ class LoginActivity : AppCompatActivity() {
             localStorage.getSesi()?.isNotEmpty()!!
         ) {
             Log.d("TAG onCreate: ", localStorage.getNis().toString())
-            if (LocalDateTime.now().format(formatter).String2Date("yyyy-MM-dd")?.before(localStorage.getSesi().String2Date("yyyy-MM-dd"))!!) {
-                Log.d( "onCreate: ", "hvjgdffffffff")
+            if (LocalDateTime.now()
+                    .format(formatter)
+                    .String2Date("yyyy-MM-dd")?.before(localStorage.getSesi()
+                        .String2Date("yyyy-MM-dd"))!!) {
+
                 startActivity(Intent(this@LoginActivity, UserActivity::class.java))
                 finish()
             } else {
@@ -54,7 +57,6 @@ class LoginActivity : AppCompatActivity() {
                 Toast.makeText(this, "Sessi anda sudah habis, silahkan login kembali", Toast.LENGTH_LONG).show()
             }
         }
-        Log.d("TAG onCreate: ", localStorage.getSesi().toString())
 
         with(btnLogin) {
             this?.setOnClickListener { checkLogin() }

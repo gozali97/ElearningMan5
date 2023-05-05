@@ -61,7 +61,8 @@ class HomeFragment : Fragment() {
         recyclerView.adapter = adapter
         dialog?.show()
 
-        dialog?.let { getUser(it) }
+        Log.d("TAG, onCreateView: ", localStorage.getSesi().toString())
+        dialog?.let { getDataMapel(it) }
         //////////////////
 
         return root
@@ -74,7 +75,7 @@ class HomeFragment : Fragment() {
 
     //////////////////
     @SuppressLint("NotifyDataSetChanged")
-    private fun getUser(dialog: AlertDialog) {
+    private fun getDataMapel(dialog: AlertDialog) {
         val params = JSONObject()
         try {
             params.put("nis", localStorage.getNis().toString())
