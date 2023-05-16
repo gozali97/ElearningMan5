@@ -77,7 +77,7 @@ class Http(context: Context?, private var url: String?) {
                 sb.append(line)
             }
             br.close()
-            Log.d(" HTTP", sb.toString())
+
             response = sb.toString()
         } catch (e: IOException) {
             e.printStackTrace()

@@ -144,6 +144,5 @@ class LoginActivity : AppCompatActivity() {
             .setPositiveButton("OK"
             ) { dialog, _ -> dialog.dismiss() }
             .show()
-
     }
 }

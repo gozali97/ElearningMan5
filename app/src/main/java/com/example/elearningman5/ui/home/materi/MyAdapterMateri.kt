@@ -66,7 +66,8 @@ class MyAdapterMateri(
         holder.recCardTugas.setOnClickListener {
             getActivity(context)?.let{
                 it.startActivity(Intent (it, TugasActivity::class.java)
-                    .putExtra("keytugas", dataList[holder.adapterPosition].getKeyTugas())
+                    .putExtra("key_tugas", dataList[holder.adapterPosition].getKeyTugas())
+                    .putExtra("nama_materi", dataList[holder.adapterPosition].getMateri())
                 )
             }
         }
@@ -94,7 +95,7 @@ class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     var recDesc: TextView
     var recCreat: TextView
     var recDownload: CardView
-    var recCardTugas: CardView //http://192.168.1.9:8000/assets/tugas//Vektor.pdf
+    var recCardTugas: CardView
 
     init {
 //        recImage = itemView.findViewById(R.id.recImage)

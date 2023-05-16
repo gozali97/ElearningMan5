@@ -67,7 +67,7 @@ open class MateriFragment : Fragment() {
         recyclerView.adapter = adapter
         dialog?.show()
 
-        dialog?.let { bundle?.let { it1 -> getUser(it, it1) } }
+        dialog?.let { bundle?.let { it1 -> getMateri(it, it1) } }
 
         binding.arrowBack.setOnClickListener {
             val navController = findNavController()
@@ -89,7 +89,7 @@ open class MateriFragment : Fragment() {
 
     ///////////////
     @SuppressLint("NotifyDataSetChanged")
-    private fun getUser(it: AlertDialog, it1: Bundle) {
+    private fun getMateri(it: AlertDialog, it1: Bundle) {
         val params = JSONObject()
         try {
             params.put("jadwal_id", it1.getString("key").toString())
@@ -97,7 +97,7 @@ open class MateriFragment : Fragment() {
             e.printStackTrace()
         }
         val data = params.toString()
-        val url = getString(R.string.api_server) + "/siswa/viewTugas"
+        val url = getString(R.string.api_server) + "/siswa/viewMateri"
 
         Thread {
             val http = Http(context, url)
