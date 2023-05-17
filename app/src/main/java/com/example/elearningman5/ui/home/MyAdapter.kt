@@ -3,7 +3,6 @@ package com.example.elearningman5.ui.home
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,8 +38,6 @@ class MyAdapter(private val context: Context,
         holder.recGuru.text = dataList[position].getGuru()
 
         holder.recCard.setOnClickListener {
-            Log.d("TAG recCard", dataList[holder.adapterPosition].getKey().toString())
-
             val arguments = Bundle()
             arguments.putString("key", dataList[holder.adapterPosition].getKey())
             arguments.putString("mapel", dataList[holder.adapterPosition].getMapel())

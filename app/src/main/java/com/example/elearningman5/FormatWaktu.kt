@@ -1,7 +1,6 @@
 package com.example.elearningman5
 
 import android.annotation.SuppressLint
-import android.util.Log
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -31,7 +30,6 @@ fun SelisihDateTime(waktuSatu: Date, waktuDua: Date): String {
     val selisihHari = selisihMS / (24 * 60 * 60 * 1000)
 
 //    "Hari" to selisihHari, "Jam" to selisihJam, "Menit" to selisihMenit, "Detik" to selisihDetik
-    Log.d("TAG, SelisihDateTime: $selisihHari $selisihJam ${selisihMenit} Menit ${selisihDetik} detik", "")
     if (selisihHari.toInt() != 0) {
         return "$selisihHari Hari"
     } else if (selisihJam.toInt() != 0) //{

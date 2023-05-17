@@ -1,7 +1,6 @@
 package com.example.elearningman5.ui.home.materi
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -16,15 +15,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.elearningman5.Http
 import com.example.elearningman5.R
 import com.example.elearningman5.databinding.FragmentMateriBinding
-import com.example.elearningman5.ui.home.tugas.TugasActivity
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import org.json.JSONException
 import org.json.JSONObject
-import java.text.ParseException
-import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.math.abs
 
 open class MateriFragment : Fragment() {
     private var _binding: FragmentMateriBinding? = null
@@ -128,12 +123,9 @@ open class MateriFragment : Fragment() {
                             val dataClass = object : TypeToken<ArrayList<DataMateriClass>>() {}.type
 
                             val addData: ArrayList<DataMateriClass> = gson.fromJson(response, dataClass)
-                            dataList?.addAll(addData)
 
+                            dataList?.addAll(addData)
                             adapter?.notifyDataSetChanged()
-                            addData.let { Log.d("Succes Materi1", it.toString()) }
-                            response.let { Log.d("Succes Materi2", it) }
-                            dataList.let { Log.d("Succes Materi3", it.toString()) }
                         }
                     } catch (e: JSONException) {
                         e.printStackTrace()

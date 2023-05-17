@@ -3,7 +3,6 @@ package com.example.elearningman5
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -41,7 +40,6 @@ class LoginActivity : AppCompatActivity() {
             localStorage.getNis()?.isNotEmpty()!! &&
             localStorage.getSesi()?.isNotEmpty()!!
         ) {
-            Log.d("TAG onCreate: ", localStorage.getNis().toString())
             if (LocalDateTime.now()
                     .format(formatter)
                     .String2Date("yyyy-MM-dd")?.before(localStorage.getSesi()
@@ -50,7 +48,6 @@ class LoginActivity : AppCompatActivity() {
                 startActivity(Intent(this@LoginActivity, UserActivity::class.java))
                 finish()
             } else {
-                Log.d("TAG onCreate: ", localStorage.getEmail().toString())
                 localStorage.setEmail("")
                 localStorage.setNis("")
                 localStorage.setSesi("")

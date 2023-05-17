@@ -12,14 +12,12 @@
     <EditText
         android:id="@+id/getEmail"
         android:hint="Email Address"
-        android:text="raafi@gmail.com"
         android:inputType="textEmailAddress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <EditText
         android:id="@+id/getPassword"
         android:hint="Password"
-        android:text="12345678"
         android:inputType="textPassword"
         android:layout_marginBottom="20dp"
         android:layout_width="match_parent"

@@ -2,7 +2,6 @@ package com.example.elearningman5.ui.home
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -61,7 +60,6 @@ class HomeFragment : Fragment() {
         recyclerView.adapter = adapter
         dialog?.show()
 
-        Log.d("TAG, onCreateView: ", localStorage.getSesi().toString())
         dialog?.let { getDataMapel(it) }
         //////////////////
 
@@ -102,13 +100,9 @@ class HomeFragment : Fragment() {
 
                         val dataClass = object : TypeToken<ArrayList<DataClass>>() {}.type
                         val addDataMapel: ArrayList<DataClass> = gson.fromJson(response, dataClass)
+
                         dataList.addAll(addDataMapel)
-
                         adapter!!.notifyDataSetChanged()
-                        addDataMapel.let { Log.d("Succes HomeFragmen", it.toString()) }
-                        response?.let { Log.d("Succes HomeFragmen", it) }
-                        dataList.let { Log.d("Succes HomeFragmen", it.toString()) }
-
                     } catch (e: JSONException) {
                         e.printStackTrace()
                     }

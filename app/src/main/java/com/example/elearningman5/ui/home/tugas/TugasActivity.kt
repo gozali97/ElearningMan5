@@ -8,7 +8,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.OpenableColumns
-import android.util.Log
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -127,7 +126,6 @@ class TugasActivity : AppCompatActivity() {
                         try {
                             response = response?.getJSONObject("data") as JSONObject
 
-                            Log.d("TAG, getTugas: ", response.toString())
                             findViewById<TextView>(R.id.judulTugas).text = response.getString("nama_tugas")
                             findViewById<TextView>(R.id.deskripsiTugas).text = response.getString("deskripsi")
 
@@ -149,14 +147,12 @@ class TugasActivity : AppCompatActivity() {
                                 }
                             } else {
                                 val detailTugas = response.getJSONObject("detail_tugas")
-                                Log.d("TAG, detailTugas: ", detailTugas.toString())
+
                                 linearLayout.removeView(findViewById<Button>(R.id.btnUpload))
                                 fileSiswa = detailTugas.getString("file")
                                 detailIdTugas = detailTugas.getString("id_detail_tugas")
 
                                 if (detailTugas.getInt("nilai") == 0) {
-                                    Log.d("TAG, nilai: ", "0")
-
                                     if (sekarang?.before(deatline)!!) {
                                         waktuSisa.text = "Sisa waktu: " + SelisihDateTime(deatline!!, sekarang)
                                     } else {
@@ -217,7 +213,6 @@ class TugasActivity : AppCompatActivity() {
 
                 setTugas(data.data!!, params, url)
             } else if (requestCode == 2) {
-                Log.d("TAG, updateTugas: ", "Belum")
                 val url = getString(R.string.api_server) + "/siswa/updateTugas"
 
                 try {
@@ -233,7 +228,6 @@ class TugasActivity : AppCompatActivity() {
 
     private fun setTugas(fileUri: Uri, params: JSONObject, url: String) {
         Thread {
-            Log.d("TAG, onActivityResult: ", fileUri.toString())
             val uploadTask = UTask(this@TugasActivity, url)
             uploadTask.setDataFile(fileUri)
             uploadTask.setFileName(getNameFile(fileUri))
