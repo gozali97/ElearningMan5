@@ -7,6 +7,7 @@ import android.content.Context.DOWNLOAD_SERVICE
 import android.content.Intent
 import android.net.Uri
 import android.os.Environment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -54,10 +55,14 @@ class MyAdapterMateri(
         }
 
         holder.recDownload.setOnClickListener {
-            val file = dataList[holder.adapterPosition].getFile()
-            if (! file?.isEmpty()!!) {
-                download(context.getString(R.string.api_server).replace("/api", "/assets/dokumen/$file"), file)
-//                download("http://192.168.1.9:8000/assets/dokumen/$file", file)
+            val files = dataList[holder.adapterPosition].getFile()
+
+            if (! files?.isEmpty()!!) {
+                val file = files.split(",")
+                for (f in file) {
+                    download(context.getString(R.string.api_server).replace("/api", "/assets/dokumen/$f"), f)
+    //                download("http://192.168.1.9:8000/assets/dokumen/$file", file)
+                }
             }
         }
 
