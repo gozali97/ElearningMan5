@@ -21,6 +21,14 @@
             android:textColor="@color/black"
             android:textSize="20sp"/>
 
+        <TextView
+            android:id="@+id/creatTugas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="date"
+            android:textColor="@color/lavender"
+            android:textSize="13sp"/>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="5dp"

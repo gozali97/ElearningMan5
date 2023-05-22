@@ -121,7 +121,7 @@ class DashboardFragment : Fragment() {
                                 ?.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }}"
                         binding.textNis.text = "NIS : ${ response?.getString("nis") }"
 
-                        binding.textEmailSiswa.text = " Email : ${ response?.getString("email") }"
+                        binding.textEmailSiswa.text = "Email : ${ response?.getString("email") }"
                         binding.textNoHp.text = "No HP : ${ response?.getString("no_hp") }"
 
                         binding.textKelas.text = "Kelas : ${ response?.getString("nama_kelas")?.uppercase() }"

@@ -3,6 +3,7 @@ package com.example.elearningman5
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -93,10 +94,10 @@ class LoginActivity : AppCompatActivity() {
             http.send()
 
             runOnUiThread {
+                var response = http.getResponse()?.let { JSONObject(it) }
                 when (val code = http.getStatusCode()) {
                     200 -> {
                         try {
-                            var response = http.getResponse()?.let { JSONObject(it) }
                             response = response?.getJSONObject("data") as JSONObject
 
                             localStorage.setEmail(response.getString("email"))
@@ -111,7 +112,6 @@ class LoginActivity : AppCompatActivity() {
                     }
                     422 -> {
                         try {
-                            val response = http.getResponse()?.let { JSONObject(it) }
                             response?.let { alertFail(it.getString("message")) }
                         } catch (e: JSONException) {
                             e.printStackTrace()
@@ -119,14 +119,14 @@ class LoginActivity : AppCompatActivity() {
                     }
                     401 -> {
                         try {
-                            val response = http.getResponse()?.let { JSONObject(it) }
                             response?.let { alertFail(it.getString("message")) }
                         } catch (e: JSONException) {
                             e.printStackTrace()
                         }
                     }
                     else -> {
-                        Toast.makeText(this@LoginActivity, "Error $code", Toast.LENGTH_SHORT).show()
+                        Log.d("TAG, sendLogin: ", code.toString())
+                        alertFail(response?.getString("message").toString())
                     }
                 }
             }

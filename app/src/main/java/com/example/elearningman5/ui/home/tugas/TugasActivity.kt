@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat
 import com.example.elearningman5.*
 import org.json.JSONException
 import org.json.JSONObject
+import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -129,6 +130,13 @@ class TugasActivity : AppCompatActivity() {
                             findViewById<TextView>(R.id.judulTugas).text = response.getString("nama_tugas")
                             findViewById<TextView>(R.id.deskripsiTugas).text = response.getString("deskripsi")
 
+                            findViewById<TextView>(R.id.creatTugas).text =
+                                response.getString("created_at").String2Date("yyyy-MM-dd'T'HH:mm:ss")
+                                    ?.let {
+                                        SimpleDateFormat("EEEE hh:mm a, dd MMMM yyyy", Locale("id", "ID"))
+                                            .format(it).toString()
+                                    }
+
                             fileTugas = response.getString("file_tugas")
                             val waktuSisa = findViewById<TextView>(R.id.waktuSisa)
 
@@ -141,6 +149,7 @@ class TugasActivity : AppCompatActivity() {
                                 linearLayout.removeView(findViewById<Button>(R.id.btnUpdate))
 
                                 if (sekarang?.before(deatline)!!) {
+                                    // buat realtime
                                     waktuSisa.text = "Sisa waktu: " + SelisihDateTime(deatline!!, sekarang)
                                 } else {
                                     linearLayout.removeView(findViewById<Button>(R.id.btnUpload))
@@ -161,6 +170,7 @@ class TugasActivity : AppCompatActivity() {
                                         linearLayout.removeView(findViewById<Button>(R.id.btnUpdate))
                                     }
                                 } else {
+                                    linearLayout.removeView(findViewById<Button>(R.id.btnUpdate))
                                     waktuSisa.text = "Nilai: " + detailTugas.getString("nilai")
                                     waktuSisa.setTextColor(ContextCompat.getColor(this@TugasActivity, R.color.green))
                                 }
