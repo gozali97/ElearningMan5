@@ -7,6 +7,7 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.os.Handler
 import android.provider.OpenableColumns
 import android.widget.Button
 import android.widget.LinearLayout
@@ -33,6 +34,8 @@ class TugasActivity : AppCompatActivity() {
     private var fileSiswa: String? = null
     private var detailIdTugas: String? = null
     private lateinit var linearLayout: LinearLayout
+    // Handler untuk memperbarui waktu setiap detik
+    private val handler = Handler()
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -141,7 +144,7 @@ class TugasActivity : AppCompatActivity() {
                             val waktuSisa = findViewById<TextView>(R.id.waktuSisa)
 
                             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                            val sekarang = LocalDateTime.now().format(formatter).String2Date("yyyy-MM-dd HH:mm:ss")
+                            val sekarang = LocalDateTime.now().minusDays(1).format(formatter).String2Date("yyyy-MM-dd HH:mm:ss")
                             val deatline = response.getString("tanggal_selesai").String2Date("yyyy-MM-dd HH:mm:ss")
 
                             if (response.getString("detail_tugas").toString() == "null") {
@@ -149,8 +152,8 @@ class TugasActivity : AppCompatActivity() {
                                 linearLayout.removeView(findViewById<Button>(R.id.btnUpdate))
 
                                 if (sekarang?.before(deatline)!!) {
-                                    // buat realtime
-                                    waktuSisa.text = "Sisa waktu: " + SelisihDateTime(deatline!!, sekarang)
+                                    // Memulai pembaruan waktu secara berkala
+                                    handler.post(updateTimeRunnable(deatline))
                                 } else {
                                     linearLayout.removeView(findViewById<Button>(R.id.btnUpload))
                                 }
@@ -163,7 +166,7 @@ class TugasActivity : AppCompatActivity() {
 
                                 if (detailTugas.getInt("nilai") == 0) {
                                     if (sekarang?.before(deatline)!!) {
-                                        waktuSisa.text = "Sisa waktu: " + SelisihDateTime(deatline!!, sekarang)
+                                        handler.post(updateTimeRunnable(deatline))
                                     } else {
                                         waktuSisa.text = "Guru Belum Memberi Nilai"
                                         waktuSisa.setTextColor(ContextCompat.getColor(this@TugasActivity, R.color.lavender))
@@ -202,6 +205,31 @@ class TugasActivity : AppCompatActivity() {
                 dialog.dismiss()
             }
         }.start()
+    }
+
+    // Menjalankan pembaruan waktu setiap detik
+    private fun updateTimeRunnable(deatline: Date?): Runnable = object : Runnable {
+        @SuppressLint("SetTextI18n")
+        override fun run() {
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+            val timeNow = LocalDateTime.now().minusDays(1).format(formatter).String2Date("yyyy-MM-dd HH:mm:ss")
+
+            // Menampilkan waktu di TextView
+            findViewById<TextView>(R.id.waktuSisa).text = "Sisa waktu: " + SelisihDateTime(deatline!!,
+                timeNow!!
+            )
+
+            if (!timeNow.before(deatline)) {
+                handler.removeCallbacks(updateTimeRunnable(deatline))
+                // refresh
+                finish()
+                startActivity(intent)
+            }
+
+            // Mengulangi pembaruan waktu setiap detik
+            handler.postDelayed(this, 1000)
+        }
+
     }
 
     @Deprecated("Deprecated in Java")
@@ -300,6 +328,12 @@ class TugasActivity : AppCompatActivity() {
         }
 
         return fileName.toString()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Menghentikan pembaruan waktu saat Activity dihancurkan
+        handler.removeCallbacks(updateTimeRunnable("2022-05-05 00:00:00".String2Date("yyyy-MM-dd HH:mm:ss")))
     }
 
     private fun alertFail(string: String) {

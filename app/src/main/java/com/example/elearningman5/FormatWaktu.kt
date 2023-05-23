@@ -29,14 +29,10 @@ fun SelisihDateTime(waktuSatu: Date, waktuDua: Date): String {
     val selisihJam = selisihMS / (60 * 60 * 1000) % 24
     val selisihHari = selisihMS / (24 * 60 * 60 * 1000)
 
-//    "Hari" to selisihHari, "Jam" to selisihJam, "Menit" to selisihMenit, "Detik" to selisihDetik
     if (selisihHari.toInt() != 0) {
         return "$selisihHari Hari"
-    } else if (selisihJam.toInt() != 0) //{
+    } else if (selisihJam.toInt() != 0)
         return "$selisihJam Jam"
-//    } else if (selisihMenit.toInt() != 0) {
-//        return "$selisihMenit menit"
-//    }
 
-    return "${selisihMenit} Menit ${selisihDetik} detik"
+    return "$selisihMenit Menit $selisihDetik detik"
 }
