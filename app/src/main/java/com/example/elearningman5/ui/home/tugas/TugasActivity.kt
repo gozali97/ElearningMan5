@@ -32,6 +32,7 @@ class TugasActivity : AppCompatActivity() {
     private lateinit var localStorage: LocalStorage
     private var fileTugas: String? = null
     private var fileSiswa: String? = null
+    private var deatline: Date? = null
     private var detailIdTugas: String? = null
     private lateinit var linearLayout: LinearLayout
     // Handler untuk memperbarui waktu setiap detik
@@ -144,8 +145,8 @@ class TugasActivity : AppCompatActivity() {
                             val waktuSisa = findViewById<TextView>(R.id.waktuSisa)
 
                             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                            val sekarang = LocalDateTime.now().minusDays(1).format(formatter).String2Date("yyyy-MM-dd HH:mm:ss")
-                            val deatline = response.getString("tanggal_selesai").String2Date("yyyy-MM-dd HH:mm:ss")
+                            val sekarang = LocalDateTime.now().format(formatter).String2Date("yyyy-MM-dd HH:mm:ss")
+                            deatline = response.getString("tanggal_selesai").String2Date("yyyy-MM-dd HH:mm:ss")
 
                             if (response.getString("detail_tugas").toString() == "null") {
                                 linearLayout.removeView(findViewById<CardView>(R.id.pdfFileIcon))
@@ -153,7 +154,7 @@ class TugasActivity : AppCompatActivity() {
 
                                 if (sekarang?.before(deatline)!!) {
                                     // Memulai pembaruan waktu secara berkala
-                                    handler.post(updateTimeRunnable(deatline))
+                                    handler.post(updateTimeRunnable)
                                 } else {
                                     linearLayout.removeView(findViewById<Button>(R.id.btnUpload))
                                 }
@@ -166,7 +167,7 @@ class TugasActivity : AppCompatActivity() {
 
                                 if (detailTugas.getInt("nilai") == 0) {
                                     if (sekarang?.before(deatline)!!) {
-                                        handler.post(updateTimeRunnable(deatline))
+                                        handler.post(updateTimeRunnable)
                                     } else {
                                         waktuSisa.text = "Guru Belum Memberi Nilai"
                                         waktuSisa.setTextColor(ContextCompat.getColor(this@TugasActivity, R.color.lavender))
@@ -208,11 +209,11 @@ class TugasActivity : AppCompatActivity() {
     }
 
     // Menjalankan pembaruan waktu setiap detik
-    private fun updateTimeRunnable(deatline: Date?): Runnable = object : Runnable {
+    private val updateTimeRunnable: Runnable = object : Runnable {
         @SuppressLint("SetTextI18n")
         override fun run() {
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-            val timeNow = LocalDateTime.now().minusDays(1).format(formatter).String2Date("yyyy-MM-dd HH:mm:ss")
+            val timeNow = LocalDateTime.now().format(formatter).String2Date("yyyy-MM-dd HH:mm:ss")
 
             // Menampilkan waktu di TextView
             findViewById<TextView>(R.id.waktuSisa).text = "Sisa waktu: " + SelisihDateTime(deatline!!,
@@ -220,7 +221,6 @@ class TugasActivity : AppCompatActivity() {
             )
 
             if (!timeNow.before(deatline)) {
-                handler.removeCallbacks(updateTimeRunnable(deatline))
                 // refresh
                 finish()
                 startActivity(intent)
@@ -299,7 +299,7 @@ class TugasActivity : AppCompatActivity() {
                         }
                     }
                     else -> {
-                        Toast.makeText(this@TugasActivity, "Error $code, ${response?.getString("message")} (Max File 10MB)", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@TugasActivity, "Error $code, ${response?.getString("message")}", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -333,7 +333,7 @@ class TugasActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         // Menghentikan pembaruan waktu saat Activity dihancurkan
-        handler.removeCallbacks(updateTimeRunnable("2022-05-05 00:00:00".String2Date("yyyy-MM-dd HH:mm:ss")))
+        handler.removeCallbacks(updateTimeRunnable)
     }
 
     private fun alertFail(string: String) {

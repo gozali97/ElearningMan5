@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.elearningman5.R
 import com.example.elearningman5.ui.home.tugas.TugasActivity
 import com.example.elearningman5.String2Date
+import com.example.elearningman5.ui.home.chat.ForumActivity
 import com.google.android.material.internal.ContextUtils.getActivity
 import java.text.SimpleDateFormat
 import java.util.*
@@ -52,6 +53,7 @@ class MyAdapterMateri(
 
         if (dataList[position].getKeyTugas() == null) {
             holder.recCardTugas.removeAllViews()
+            holder.recCardChat.removeAllViews()
         }
 
         holder.recDownload.setOnClickListener {
@@ -72,6 +74,13 @@ class MyAdapterMateri(
                     .putExtra("key_tugas", dataList[holder.adapterPosition].getKeyTugas())
                     .putExtra("nama_materi", dataList[holder.adapterPosition].getMateri())
                 )
+            }
+        }
+
+        holder.recCardChat.setOnClickListener {
+            Log.d("TAG, onBindViewHolder: ", "ini forum diskusi")
+            getActivity(context)?.let{
+                it.startActivity(Intent (it, ForumActivity::class.java))
             }
         }
     }
@@ -99,11 +108,13 @@ class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     var recCreat: TextView
     var recDownload: CardView
     var recCardTugas: CardView
+    var recCardChat: CardView
 
     init {
 //        recImage = itemView.findViewById(R.id.recImage)
         recDownload = itemView.findViewById(R.id.recCardDownload)
         recCardTugas = itemView.findViewById(R.id.recCardTugas)
+        recCardChat = itemView.findViewById(R.id.recCardChat)
         recCreat = itemView.findViewById(R.id.recCreat)
         recMateri = itemView.findViewById(R.id.recMateri)
         recDesc = itemView.findViewById(R.id.recDesMateri)

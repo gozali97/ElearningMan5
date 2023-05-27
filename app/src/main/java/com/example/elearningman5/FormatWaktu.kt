@@ -9,6 +9,11 @@ import kotlin.math.abs
 class FormatWaktu {
 }
 
+fun fromMillisToTimeString(millis: Date) : String {
+    val format = SimpleDateFormat("hh:mm a", Locale.getDefault())
+    return format.format(millis)
+}
+
 @SuppressLint("SimpleDateFormat")
 fun String?.String2Date(formatDate: String): Date? {
     try {
@@ -31,8 +36,10 @@ fun SelisihDateTime(waktuSatu: Date, waktuDua: Date): String {
 
     if (selisihHari.toInt() != 0) {
         return "$selisihHari Hari"
-    } else if (selisihJam.toInt() != 0)
+    } else if (selisihJam.toInt() != 0) {
         return "$selisihJam Jam"
+    } else if (selisihMenit.toInt() == 0)
+        return "$selisihDetik detik"
 
     return "$selisihMenit Menit $selisihDetik detik"
 }

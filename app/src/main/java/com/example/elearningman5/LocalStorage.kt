@@ -8,6 +8,7 @@ class LocalStorage(context: Context?) {
         context!!.getSharedPreferences("STORAGE_LOGIN_API", Context.MODE_PRIVATE)
     private var editor: SharedPreferences.Editor = sharedPreferences.edit()
     private var token: String? = null
+    private var name: String? = null
     private var email: String? = null
     private var nis: String? = null
     private var sesiBerakhir: String? = null
@@ -20,6 +21,15 @@ class LocalStorage(context: Context?) {
         editor.putString("access_token", token)
         editor.commit()
         this.token = token
+    }
+
+    fun getName(): String? {
+        return sharedPreferences.getString("name", "")
+    }
+
+    fun setName(name: String) {
+        editor.putString("name", name).commit()
+        this.name = name
     }
 
     fun getEmail(): String? {

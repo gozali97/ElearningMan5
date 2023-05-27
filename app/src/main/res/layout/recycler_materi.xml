@@ -16,7 +16,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="190dp">
+        android:layout_height="160dp">
 
         <com.google.android.material.imageview.ShapeableImageView
             android:layout_width="match_parent"
@@ -30,7 +30,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="105dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
@@ -49,7 +49,7 @@
                 android:fontFamily="sans-serif-black"
                 android:text="@string/materi"
                 android:textColor="@color/lavender"
-                android:textSize="13sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/recDesMateri"
@@ -60,8 +60,7 @@
                 android:fontFamily="sans-serif"
                 android:text="@string/deskripsi_materi"
                 android:textColor="@color/lavender"
-                android:textSize="10sp"
-                tools:ignore="SmallSp" />
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/recCreat"
@@ -72,7 +71,7 @@
                 android:fontFamily="sans-serif"
                 android:text="@string/tanggal_dan_waktu"
                 android:textColor="@color/lavender"
-                android:textSize="8sp"
+                android:textSize="9.5sp"
                 tools:ignore="SmallSp" />
 
             <LinearLayout
@@ -102,7 +101,7 @@
                             android:fontFamily="sans-serif"
                             android:text="@string/download_materi"
                             android:textColor="@color/lavender"
-                            android:textSize="8sp"
+                            android:textSize="10sp"
                             tools:ignore="SmallSp" />
 
                         <ImageView
@@ -137,7 +136,7 @@
                             android:fontFamily="sans-serif"
                             android:text="@string/tugas"
                             android:textColor="@color/lavender"
-                            android:textSize="8sp"
+                            android:textSize="10sp"
                             tools:ignore="SmallSp" />
 
                         <ImageView
@@ -146,6 +145,41 @@
                             android:layout_width="25dp"
                             android:layout_height="25dp"
                             android:src="@drawable/baseline_file_open_24" />
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/recCardChat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:clickable="true"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    app:cardCornerRadius="15dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:layout_marginStart="5dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:fontFamily="sans-serif"
+                            android:text="@string/forum_diskusi"
+                            android:textColor="@color/lavender"
+                            android:textSize="10sp"
+                            tools:ignore="SmallSp" />
+
+                        <ImageView
+                            android:layout_marginVertical="3dp"
+                            android:layout_marginEnd="5dp"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:src="@drawable/baseline_forum_24" />
 
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>

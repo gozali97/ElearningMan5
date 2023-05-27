@@ -100,6 +100,7 @@ class LoginActivity : AppCompatActivity() {
                         try {
                             response = response?.getJSONObject("data") as JSONObject
 
+                            localStorage.setName(response.getString("name"))
                             localStorage.setEmail(response.getString("email"))
                             localStorage.setNis(response.getJSONObject("siswa").getString("nis"))
                             localStorage.setSesi(LocalDateTime.now().plusDays(5).format(formatter).toString())

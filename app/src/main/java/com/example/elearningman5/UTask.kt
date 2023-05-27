@@ -69,14 +69,14 @@ class UTask(
             outputStream.writeBytes("Content-Type: application/pdf\r\n\r\n")
 
             val inputStream = context?.contentResolver?.openInputStream(fileUri)
-            val buffer = ByteArray(10485760) // 10 MB (10 x 1024 x 1024 = 10485760 byte)
+            val buffer = ByteArray(10 * 1024 * 1024)
             var bytesRead = -1
             var totalBytesRead = 0
 
             while (inputStream!!.read(buffer).also { bytesRead = it } != -1) {
                 outputStream.write(buffer, 0, bytesRead)
                 totalBytesRead += bytesRead
-                if (totalBytesRead > (10 * 1024 * 1024)) { // Melebihi 10 MB
+                if (totalBytesRead > (10 * 1024 * 1024)) { // Melebihi // 10 MB (10 x 1024 x 1024 = 10485760 byte)
                     throw Exception("File terlalu besar")
                 }
             }
