@@ -1,20 +1,20 @@
 package com.example.elearningman5.ui.home.tugas
 
 import android.annotation.SuppressLint
-import android.app.DownloadManager
 import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.os.Handler
 import android.provider.OpenableColumns
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import com.example.elearningman5.*
@@ -38,9 +38,15 @@ class TugasActivity : AppCompatActivity() {
     // Handler untuk memperbarui waktu setiap detik
     private val handler = Handler()
 
-    @SuppressLint("MissingInflatedId")
+    @SuppressLint("MissingInflatedId", "SetTextI18n", "AppCompatMethod")
     override fun onCreate(savedInstanceState: Bundle?) {
-        supportActionBar!!.title = "TUGAS (${intent.extras?.getString("nama_materi")})"
+        supportActionBar?.apply {
+            displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
+            setCustomView(R.layout.abs_layout)
+            setDisplayHomeAsUpEnabled(true)
+            setHomeAsUpIndicator(R.drawable.baseline_arrow_back_24)
+        }
+        findViewById<AppCompatTextView>(R.id.toolbarTitle).text = "Tugas ${intent.extras?.getString("nama_materi")}"
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tugas)
@@ -80,7 +86,8 @@ class TugasActivity : AppCompatActivity() {
         recCardFileTugas.setOnClickListener {
             if (! fileTugas?.isEmpty()!!) {
 //                download(getString(R.string.api_server).trimEnd('/') + "/assets/tugas/$fileTugas",
-                download(getString(R.string.api_server).replace("/api", "/assets/tugas/$fileTugas"),
+                DownloadFile.download(this@TugasActivity, getString(R.string.api_server)
+                    .replace("/api", "/assets/tugas/$fileTugas"),
                     fileTugas!!
                 )
             }
@@ -88,22 +95,12 @@ class TugasActivity : AppCompatActivity() {
 
         pdfFileIcon.setOnClickListener {
             if (! fileSiswa?.isEmpty()!!) {
-                download(getString(R.string.api_server).replace("/api", "/assets/tugas-siswa/$fileSiswa"),
+                DownloadFile.download(this@TugasActivity, getString(R.string.api_server)
+                    .replace("/api", "/assets/tugas-siswa/$fileSiswa"),
                     fileSiswa!!
                 )
             }
         }
-    }
-
-    private fun download(url: String, filename: String) {
-        val request = DownloadManager.Request(Uri.parse(url))
-            .setDescription("Downloading...")
-            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-            .setAllowedOverMetered(true)
-            .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename)
-
-        val dm = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
-        dm.enqueue(request)
     }
 
     @SuppressLint("SetTextI18n")
@@ -145,7 +142,7 @@ class TugasActivity : AppCompatActivity() {
                             val waktuSisa = findViewById<TextView>(R.id.waktuSisa)
 
                             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                            val sekarang = LocalDateTime.now().format(formatter).String2Date("yyyy-MM-dd HH:mm:ss")
+                            val sekarang = LocalDateTime.now().minusDays(1).format(formatter).String2Date("yyyy-MM-dd HH:mm:ss")
                             deatline = response.getString("tanggal_selesai").String2Date("yyyy-MM-dd HH:mm:ss")
 
                             if (response.getString("detail_tugas").toString() == "null") {
@@ -213,7 +210,7 @@ class TugasActivity : AppCompatActivity() {
         @SuppressLint("SetTextI18n")
         override fun run() {
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-            val timeNow = LocalDateTime.now().format(formatter).String2Date("yyyy-MM-dd HH:mm:ss")
+            val timeNow = LocalDateTime.now().minusDays(1).format(formatter).String2Date("yyyy-MM-dd HH:mm:ss")
 
             // Menampilkan waktu di TextView
             findViewById<TextView>(R.id.waktuSisa).text = "Sisa waktu: " + SelisihDateTime(deatline!!,
@@ -334,6 +331,7 @@ class TugasActivity : AppCompatActivity() {
         super.onDestroy()
         // Menghentikan pembaruan waktu saat Activity dihancurkan
         handler.removeCallbacks(updateTimeRunnable)
+        DownloadFile.unregisterDownloadCompleteReceiver(this@TugasActivity)
     }
 
     private fun alertFail(string: String) {

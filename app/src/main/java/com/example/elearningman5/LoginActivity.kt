@@ -7,8 +7,10 @@ import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatTextView
 import org.json.JSONException
 import org.json.JSONObject
 import java.time.LocalDateTime
@@ -26,42 +28,56 @@ class LoginActivity : AppCompatActivity() {
 
     private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
-        supportActionBar!!.title = "LOGIN PAGE"
+        supportActionBar?.apply {
+            displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
+            setCustomView(R.layout.abs_layout)
+        }
+        findViewById<AppCompatTextView>(R.id.toolbarTitle).text = "Madrasah Aliyah Negeri 5 Sleman"
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
         localStorage = LocalStorage(this@LoginActivity)
 
-        etEmail = findViewById(R.id.getEmail)
-        etPassword = findViewById(R.id.getPassword)
+        etEmail = findViewById(R.id.txtEmail)
+        etPassword = findViewById(R.id.txtPassword)
         btnLogin = findViewById(R.id.btnLogin)
+
+        val builder = this@LoginActivity.let { AlertDialog.Builder(it) }
+        builder.setCancelable(false)
+        builder.setView(R.layout.progress_layout)
+        val dialog = builder.create()
 
         if (localStorage.getEmail()?.isNotEmpty()!! &&
             localStorage.getNis()?.isNotEmpty()!! &&
             localStorage.getSesi()?.isNotEmpty()!!
         ) {
+            dialog.show()
             if (LocalDateTime.now()
                     .format(formatter)
                     .String2Date("yyyy-MM-dd")?.before(localStorage.getSesi()
                         .String2Date("yyyy-MM-dd"))!!) {
 
+                dialog.dismiss()
                 startActivity(Intent(this@LoginActivity, UserActivity::class.java))
                 finish()
             } else {
                 localStorage.setEmail("")
                 localStorage.setNis("")
                 localStorage.setSesi("")
+                dialog.dismiss()
                 Toast.makeText(this, "Sessi anda sudah habis, silahkan login kembali", Toast.LENGTH_LONG).show()
             }
         }
 
         with(btnLogin) {
-            this?.setOnClickListener { checkLogin() }
+            this?.setOnClickListener { checkLogin(dialog) }
         }
     }
 
-    private fun checkLogin() {
+    private fun checkLogin(dialog: AlertDialog) {
         email = etEmail!!.text.toString()
         password = etPassword!!.text.toString()
         if (email!!.isEmpty() || password!!.isEmpty()) {
@@ -69,12 +85,13 @@ class LoginActivity : AppCompatActivity() {
         } else if (password!!.length < 8) {
             alertFail("Password are not long enough")
         } else {
-            sendLogin()
+            dialog.show()
+            sendLogin(dialog)
         }
     }
 
     @SuppressLint("SimpleDateFormat")
-    private fun sendLogin() {
+    private fun sendLogin(dialog: AlertDialog) {
         val params = JSONObject()
 
         try {
@@ -100,7 +117,6 @@ class LoginActivity : AppCompatActivity() {
                         try {
                             response = response?.getJSONObject("data") as JSONObject
 
-                            localStorage.setName(response.getString("name"))
                             localStorage.setEmail(response.getString("email"))
                             localStorage.setNis(response.getJSONObject("siswa").getString("nis"))
                             localStorage.setSesi(LocalDateTime.now().plusDays(5).format(formatter).toString())
@@ -130,6 +146,7 @@ class LoginActivity : AppCompatActivity() {
                         alertFail(response?.getString("message").toString())
                     }
                 }
+                dialog.dismiss()
             }
         }.start()
     }

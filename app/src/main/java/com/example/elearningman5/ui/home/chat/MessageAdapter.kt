@@ -32,7 +32,7 @@ class MessageAdapter (private val context: Context) : RecyclerView.Adapter<Messa
     override fun getItemViewType(position: Int): Int {
         val message = messages[position]
 
-        return if(localStorage.getName() == message.user) {
+        return if(localStorage.getEmail() == message.email) {
             VIEW_TYPE_MY_MESSAGE
         }
         else {
@@ -75,7 +75,7 @@ class MessageAdapter (private val context: Context) : RecyclerView.Adapter<Messa
 
         override fun bind(message: Message) {
             messageText.text = message.message
-            userText.text = message.user
+            userText.text = message.name
             timeText.text = message.time.String2Date("yyyy-MM-dd'T'HH:mm:ss")
                 ?.let { fromMillisToTimeString(it) }
         }

@@ -2,12 +2,12 @@ package com.example.elearningman5.ui.home.materi
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -32,6 +32,7 @@ open class MateriFragment : Fragment() {
     private var dataList: ArrayList<DataMateriClass>? = null
     private var adapter: MyAdapterMateri? = null
 
+    @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -42,9 +43,12 @@ open class MateriFragment : Fragment() {
         val bundle = this.arguments
 
         ///////////////
+        // Access the toolbarTitle view
+        val toolbarTitle: AppCompatTextView? = activity?.findViewById(R.id.toolbarTitle)
+
+        // Set the text of the toolbarTitle TextView
         if (bundle != null) {
-            Log.d("TAG Tugas Fragment", bundle.getString("key").toString())
-            Log.d("TAG Tugas Fragment", bundle.getString("mapel").toString())
+            toolbarTitle?.text = "Materi " + bundle.getString("mapel").toString()
         }
         
         val recyclerView: RecyclerView = binding.recyclerViewTugas

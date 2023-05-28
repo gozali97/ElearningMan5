@@ -3,8 +3,8 @@
     <string name="api_server">http://adiwebelearning.my.id/api</string>
 
     <string name="title_activity_user">UserActivity</string>
-    <string name="title_home">Tugas</string>
-    <string name="title_dashboard">Profile</string>
+    <string name="title_home">Tugas Kelas</string>
+    <string name="title_dashboard">Profile Siswa</string>
     <string name="title_notifications">Notifications</string>
 
     <string name="kelas">KELAS</string>
@@ -22,4 +22,5 @@
     <string name="lampiran_tugas">Lampiran Tugas</string>
     <string name="tugas_anda">Tugas Anda</string>
     <string name="sisa_waktu">Sisa waktu: habis</string>
+    <string name="forum_diskusi">Forum Diskusi</string>
 </resources>

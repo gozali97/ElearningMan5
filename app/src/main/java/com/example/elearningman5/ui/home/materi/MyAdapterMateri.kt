@@ -1,12 +1,8 @@
 package com.example.elearningman5.ui.home.materi
 
 import android.annotation.SuppressLint
-import android.app.DownloadManager
 import android.content.Context
-import android.content.Context.DOWNLOAD_SERVICE
 import android.content.Intent
-import android.net.Uri
-import android.os.Environment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.elearningman5.DownloadFile
 import com.example.elearningman5.R
 import com.example.elearningman5.ui.home.tugas.TugasActivity
 import com.example.elearningman5.String2Date
@@ -62,8 +59,8 @@ class MyAdapterMateri(
             if (! files?.isEmpty()!!) {
                 val file = files.split(",")
                 for (f in file) {
-                    download(context.getString(R.string.api_server).replace("/api", "/assets/dokumen/$f"), f)
-    //                download("http://192.168.1.9:8000/assets/dokumen/$file", file)
+                    DownloadFile.download(context, context.getString(R.string.api_server)
+                        .replace("/api", "/assets/dokumen/$f"), f)
                 }
             }
         }
@@ -89,15 +86,9 @@ class MyAdapterMateri(
         return dataList.size
     }
 
-    private fun download(url: String, filename: String) {
-            val request = DownloadManager.Request(Uri.parse(url))
-                .setDescription("Downloading...")
-                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-                .setAllowedOverMetered(true)
-                .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename)
-
-            val dm = context.getSystemService(DOWNLOAD_SERVICE) as DownloadManager
-            dm.enqueue(request)
+    override fun onViewDetachedFromWindow(holder: MyViewHolder) {
+        super.onViewDetachedFromWindow(holder)
+        DownloadFile.unregisterDownloadCompleteReceiver(context)
     }
 }
 
