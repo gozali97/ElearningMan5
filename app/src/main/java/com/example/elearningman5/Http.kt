@@ -41,9 +41,11 @@ class Http(context: Context?, private var url: String?) {
     }
 
     fun send() {
+        var connection: HttpURLConnection? = null
         try {
             val sUrl = URL(url)
-            val connection = sUrl.openConnection() as HttpURLConnection
+            connection = sUrl.openConnection() as HttpURLConnection
+
             connection.requestMethod = method
             connection.setRequestProperty("Content-Type", "application/json")
             connection.setRequestProperty("X-Requested-With", "XMLHttpRequest")
@@ -80,6 +82,9 @@ class Http(context: Context?, private var url: String?) {
             response = sb.toString()
         } catch (e: IOException) {
             e.printStackTrace()
+        } finally {
+            // Disconnect koneksi setelah selesai
+            connection?.disconnect()
         }
     }
 }

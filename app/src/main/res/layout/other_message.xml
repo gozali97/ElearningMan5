@@ -5,7 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="8dp">
+    android:background="@color/transparent"
+    android:paddingVertical="3dp">
 
     <TextView
         android:id="@+id/txtOtherUser"
@@ -19,16 +20,30 @@
         tools:ignore="MissingConstraints" />
 
     <TextView
-        android:id="@+id/txtOtherMessage"
-        android:text="Hi, John's message"
-        android:background="@drawable/other_message_bubble"
+        android:id="@+id/txtReceiverRole"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:text="(Role)"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="@color/teal_200"
+        app:layout_constraintStart_toEndOf="@+id/txtOtherUser"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="MissingConstraints" />
+
+    <TextView
+        android:id="@+id/txtOtherMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/other_message_bubble"
         android:maxWidth="240dp"
         android:padding="15dp"
-        android:elevation="5dp"
+        android:text="Hi, John's message"
         android:textColor="#ffffff"
-        android:layout_marginTop="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtOtherUser"
         tools:ignore="MissingConstraints" />
 

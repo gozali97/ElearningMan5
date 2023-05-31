@@ -3,6 +3,7 @@ package com.example.elearningman5
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.text.Html
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
@@ -146,6 +147,7 @@ class LoginActivity : AppCompatActivity() {
                         alertFail(response?.getString("message").toString())
                     }
                 }
+                findViewById<EditText>(R.id.txtPassword).text.clear()
                 dialog.dismiss()
             }
         }.start()
@@ -155,7 +157,7 @@ class LoginActivity : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle("Failed")
             .setIcon(R.drawable.ic_warning_24)
-            .setMessage(s)
+            .setMessage(Html.fromHtml("<font color='#AC1212'>$s</font>"))
             .setPositiveButton("OK"
             ) { dialog, _ -> dialog.dismiss() }
             .show()

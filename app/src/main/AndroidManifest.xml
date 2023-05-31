@@ -28,6 +28,7 @@
         <activity
             android:name=".UserActivity"
             android:exported="false"
+            android:parentActivityName=".UserActivity"
             android:label="@string/title_activity_user" />
         <activity
             android:name=".LoginActivity"

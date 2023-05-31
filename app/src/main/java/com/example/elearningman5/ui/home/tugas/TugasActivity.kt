@@ -28,12 +28,12 @@ import java.util.*
 
 @Suppress("DEPRECATION")
 class TugasActivity : AppCompatActivity() {
-
     private lateinit var localStorage: LocalStorage
     private var fileTugas: String? = null
     private var fileSiswa: String? = null
     private var deatline: Date? = null
     private var detailIdTugas: String? = null
+
     private lateinit var linearLayout: LinearLayout
     // Handler untuk memperbarui waktu setiap detik
     private val handler = Handler()
@@ -226,7 +226,6 @@ class TugasActivity : AppCompatActivity() {
             // Mengulangi pembaruan waktu setiap detik
             handler.postDelayed(this, 1000)
         }
-
     }
 
     @Deprecated("Deprecated in Java")

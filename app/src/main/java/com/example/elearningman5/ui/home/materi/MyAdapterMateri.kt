@@ -77,7 +77,10 @@ class MyAdapterMateri(
         holder.recCardChat.setOnClickListener {
             Log.d("TAG, onBindViewHolder: ", "ini forum diskusi")
             getActivity(context)?.let{
-                it.startActivity(Intent (it, ForumActivity::class.java))
+                it.startActivity(Intent (it, ForumActivity::class.java)
+                    .putExtra("key_chat", dataList[holder.adapterPosition].getKeyMateri())
+                    .putExtra("nama_materi", dataList[holder.adapterPosition].getMateri())
+                )
             }
         }
     }
