@@ -29,7 +29,6 @@ class MessageAdapter (private val context: Context) : RecyclerView.Adapter<Messa
     @SuppressLint("NotifyDataSetChanged")
     fun addMessage(message: Message){
         messages.add(message)
-        notifyDataSetChanged()
     }
 
     fun setItemClickListener(listener: ItemClickListener) {
@@ -59,7 +58,10 @@ class MessageAdapter (private val context: Context) : RecyclerView.Adapter<Messa
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
         return when (viewType) {
             TIME_MESSAGE -> {
-                TimeMessage(LayoutInflater.from(context).inflate(R.layout.time_message, parent, false))
+                val view = LayoutInflater.from(context).inflate(R.layout.time_message, parent, false)
+                TimeMessage(view).apply {
+                    setItemClickListener(itemClickListener) //untuk mengatur itemClickListener pada instance ViewHolder
+                }
             }
             VIEW_TYPE_MY_MESSAGE -> {
                 val view = LayoutInflater.from(context).inflate(R.layout.my_message, parent, false)
@@ -86,6 +88,13 @@ class MessageAdapter (private val context: Context) : RecyclerView.Adapter<Messa
 
         override fun bind(message: Message) {
             txtTime.text = message.time
+
+            itemView.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    itemClickListener.onItemClick(position)
+                }
+            }
         }
     }
 

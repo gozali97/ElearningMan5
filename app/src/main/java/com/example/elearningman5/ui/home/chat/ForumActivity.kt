@@ -32,13 +32,17 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
     private lateinit var adapter: MessageAdapter
     private lateinit var messageList: RecyclerView
     private lateinit var visibilityElement: FloatingActionButton
+    private lateinit var dialog: AlertDialog
 
+    private var cekHari: Date? = null
     private var keyMessage = 0
+
     private var retryAttempts = 1
     private val maxRetryAttempts = 4
-    private var initialBackoffDelay = 2000L // 2 second
+    private var initialBackoffDelay = 1000L // 1 second
     private val handler = Handler()
 
+    private var cekUpdate = false
     private var isYesteday = true
     private var isToday = true
 
@@ -59,6 +63,13 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
         val txtMessage = findViewById<EditText>(R.id.txtMessage)
         visibilityElement = findViewById(R.id.arrow_bottom)
         messageList = findViewById(R.id.messageList)
+
+        // Membuat dialog progress
+        val builder = AlertDialog.Builder(this@ForumActivity)
+        builder.setCancelable(false)
+        builder.setView(R.layout.progress_layout)
+        dialog = builder.create()
+        dialog.show()
 
         messageList.layoutManager = LinearLayoutManager(this@ForumActivity)
         adapter = MessageAdapter(this@ForumActivity)
@@ -93,7 +104,7 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
         hideKeyboard()
     }
 
-    @SuppressLint("SimpleDateFormat")
+    @SuppressLint("SimpleDateFormat", "NotifyDataSetChanged")
     private fun getMessage() {
         val urlForum = getString(R.string.api_server) + "/materi/diskusi"
         val paramsForum = JSONObject()
@@ -121,38 +132,23 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
                             try {
                                 if (response?.getJSONArray("data").toString() != "[]") {
                                     val pattern = "yyyy-MM-dd'T'00:00:00"
-                                    var cekHari: Date? = null
-
                                     val format = DateTimeFormatter.ofPattern(pattern)
+
                                     val kemarin = LocalDateTime.now().format(format).String2Date(pattern)
                                     val lusa = LocalDateTime.now().minusDays(1).format(format).String2Date(pattern)
 
                                     for (i in 0 until (response?.getJSONArray("data")?.length() ?: 0)) {
                                         val item = response?.getJSONArray("data")?.getJSONObject(i)
-
-                                        keyMessage = item?.getString("id_diskusi")!!.toInt()
-                                        val waktu = item.getString("created_at").String2Date("yyyy-MM-dd'T'HH:mm:ss")
+                                        val waktu = item?.getString("created_at").String2Date("yyyy-MM-dd'T'HH:mm:ss")
 
                                         if(waktu!!.before(lusa)) {
-                                            val formatHari = SimpleDateFormat(pattern)
-                                            val outputFormat1 = SimpleDateFormat("dd-MM-yyyy")
-
-                                            if (i == 0) {
-                                                val calendar = Calendar.getInstance()
-                                                calendar.time = waktu
-                                                calendar.add(Calendar.DAY_OF_MONTH, 1)
-
-                                                cekHari = formatHari.format(calendar.time).String2Date(pattern)
-                                                addMessage(outputFormat1.format(waktu).toString())
+                                            if (keyMessage == 0) {
+                                                addMessage(pattern, waktu)
+                                                Toast.makeText(this@ForumActivity, "Mohon Tunggu Sebentar", Toast.LENGTH_LONG).show()
                                             }
 
                                             if (! waktu.before(cekHari) ) {
-                                                val calendar = Calendar.getInstance()
-                                                calendar.time = waktu
-                                                calendar.add(Calendar.DAY_OF_MONTH, 1)
-
-                                                cekHari = formatHari.format(calendar.time).String2Date(pattern)
-                                                addMessage(outputFormat1.format(waktu).toString())
+                                                addMessage(pattern, waktu)
                                             }
                                         } else if(waktu.before(kemarin)) {
                                             if (isYesteday) {
@@ -166,8 +162,16 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
                                                 addMessage("Today")
                                             }
                                         }
+
                                         addMessage(item = item)
+                                        cekUpdate = true
+                                        keyMessage = item!!.getString("id_diskusi").toInt()
                                     }
+                                } else if (cekUpdate) {
+                                    adapter.notifyDataSetChanged()
+                                    dialog.dismiss()
+                                    scrolledToBottom()
+                                    cekUpdate = false
                                 }
                             } catch (e: JSONException) {
                                 e.printStackTrace()
@@ -206,8 +210,21 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
         }.start()
     }
 
-    private fun addMessage(waktu: String? = "Error", item: JSONObject? = null) {
+    @SuppressLint("SimpleDateFormat")
+    private fun addMessage(pattern: String = "null", waktu: Date?= null, item: JSONObject? = null) {
         if (item == null) {
+            var formatWaktu: String = pattern
+
+            if (waktu != null && pattern != "null") {
+                val formatHari = SimpleDateFormat(pattern)
+                formatWaktu = SimpleDateFormat("dd-MM-yyyy").format(waktu).toString()
+                val calendar = Calendar.getInstance()
+
+                calendar.time = waktu
+                calendar.add(Calendar.DAY_OF_MONTH, 1)
+                cekHari = formatHari.format(calendar.time).String2Date(pattern)
+            }
+
             // Tambahkan item baru ke dalam adapter
             adapter.addMessage(
                 Message(
@@ -215,7 +232,7 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
                 "timeMessage",
                 "timeMessage",
                 "timeMessage",
-                waktu.toString()
+                    formatWaktu
             ))
         } else {
             adapter.addMessage(
@@ -227,15 +244,12 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
                     item.getString("created_at").toString()
             ))
         }
-
-        // Mengatur posisi scroll ke item terakhir
-        scrolledToBottom()
     }
 
     private val updateTimeRunnable: Runnable = object : Runnable {
         @SuppressLint("SetTextI18n")
         override fun run() {
-//            getMessage()
+            getMessage()
             visibilityFloatingActionButton()
 
             // Mengulangi pembaruan waktu setiap detik
@@ -282,6 +296,8 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
                 when (val code = http.getStatusCode()) {
                     200 -> {
                         try {
+                            // Clean text box
+                            txtMessage.text.clear()
                             Toast.makeText(this@ForumActivity, "Pesan berhasil dikirim", Toast.LENGTH_SHORT).show()
                         } catch (e: JSONException) {
                             e.printStackTrace()
@@ -306,9 +322,6 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
                         alertFail(response?.getString("message").toString())
                     }
                 }
-
-                // Clean text box
-                txtMessage.text.clear()
             }
         }.start()
     }
