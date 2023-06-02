@@ -274,6 +274,7 @@ class TugasActivity : AppCompatActivity() {
                     200 -> {
                         try {
                             // refresh
+                            Toast.makeText(this@TugasActivity, "File tugas berhasil di-upload", Toast.LENGTH_LONG).show()
                             finish()
                             startActivity(intent)
                         } catch (e: JSONException) {

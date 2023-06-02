@@ -18,7 +18,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-
+// Desain UI: https://badoystudio.com/membuat-login-ui-design-menarik-android/
 class LoginActivity : AppCompatActivity() {
     private var email: String? = null
     private var password: String? = null

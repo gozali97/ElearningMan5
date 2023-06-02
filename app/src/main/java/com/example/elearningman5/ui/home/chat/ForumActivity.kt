@@ -85,7 +85,7 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
         findViewById<CardView>(R.id.btnSendChat).setOnClickListener {
             if (txtMessage.text.isNotEmpty()) {
                 hideKeyboard()
-                messageList.smoothScrollToPosition(adapter.itemCount - 1)
+                scrolledToBottom()
 
 //               untuk created_at, updated_at
                 val sekarang = LocalDateTime.now().format(DateTimeFormatter
@@ -169,9 +169,11 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
                                     }
                                 } else if (cekUpdate) {
                                     adapter.notifyDataSetChanged()
-                                    dialog.dismiss()
                                     scrolledToBottom()
+                                    dialog.dismiss()
                                     cekUpdate = false
+                                } else if (keyMessage == 0) {
+                                    dialog.dismiss()
                                 }
                             } catch (e: JSONException) {
                                 e.printStackTrace()
@@ -330,7 +332,8 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
         // Mengecek apakah fokus tampilan berada di bawah
         if (!messageList.canScrollVertically(1)) {
             // Mengatur posisi scroll ke item terakhir dengan animasi
-            messageList.smoothScrollToPosition(adapter.itemCount - 1)
+            messageList.scrollToPosition(adapter.itemCount - 1)
+//            smoothScrollToPosition(adapter.itemCount - 1)
         }
     }
 

@@ -1,4 +1,4 @@
-package com.example.elearningman5.ui.dashboard
+package com.example.elearningman5.ui.profile
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -10,15 +10,17 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.example.elearningman5.*
-import com.example.elearningman5.databinding.FragmentDashboardBinding
+import com.example.elearningman5.databinding.FragmentProfileBinding
 import com.squareup.picasso.Picasso
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
 
-class DashboardFragment : Fragment() {
 
-    private var _binding: FragmentDashboardBinding? = null
+//Desain UI: https://github.com/theindianappguy/SampleProfileUi
+class ProfileFragment : Fragment() {
+
+    private var _binding: FragmentProfileBinding? = null
     private lateinit var localStorage: LocalStorage
 
     // This property is only valid between onCreateView and
@@ -30,7 +32,7 @@ class DashboardFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentDashboardBinding.inflate(inflater, container, false)
+        _binding = FragmentProfileBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
         //////////////
@@ -111,18 +113,18 @@ class DashboardFragment : Fragment() {
                             .load(getString(R.string.api_server)
                                 .replace("/api",
                                     "/assets/img/${response?.getString("gambar")}"))
-                            .error(R.drawable.baseline_person_24)
+                            .error(R.drawable.profile_user)
                             .resize(300, 300)
                             .centerCrop()
                             .into(binding.recProfile)
 
                         binding.textNama.text =
-                            "Nama : ${response?.getString("name")
+                            "${response?.getString("name")
                                 ?.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }}"
-                        binding.textNis.text = "NIS : ${ response?.getString("nis") }"
+                        binding.textNis.text = "${ response?.getString("nis") }"
 
                         binding.textEmailSiswa.text = "Email : ${ response?.getString("email") }"
-                        binding.textNoHp.text = "No HP : ${ response?.getString("no_hp") }"
+                        binding.textNoHp.text = "No. Hp : ${ response?.getString("no_hp") }"
 
                         binding.textKelas.text = "Kelas : ${ response?.getString("nama_kelas")?.uppercase() }"
                         binding.textJurusan.text = "Jurusan : ${ response?.getString("nama_jurusan")?.uppercase() }"
