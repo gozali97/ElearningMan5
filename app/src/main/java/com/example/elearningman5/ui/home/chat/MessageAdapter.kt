@@ -124,7 +124,13 @@ class MessageAdapter (private val context: Context) : RecyclerView.Adapter<Messa
         override fun bind(message: Message) {
             messageText.text = message.message.trimEnd('\r', '\n')
             userText.text = message.name
-            receiverRole.text = "(${ message.receiver_role })"
+            receiverRole.text = "(${
+                when (message.receiver_role) {
+                    "2" -> "Siswa"
+                    "3" -> "Guru"
+                    else -> "Admin"
+                }
+            })"
             timeText.text = message.time
 
             itemView.setOnClickListener {
