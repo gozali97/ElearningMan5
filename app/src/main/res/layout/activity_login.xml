@@ -49,10 +49,12 @@
                     app:srcCompat="@drawable/baseline_email_24" />
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/emailContainer"
+                    app:helperTextTextColor="#CC0000"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <EditText
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/txtEmail"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -78,11 +80,14 @@
                     app:srcCompat="@drawable/baseline_lock_24" />
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/passwordContainer"
+                    app:helperTextTextColor="#CC0000"
+                    app:counterEnabled="true"
+                    app:passwordToggleEnabled="true"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:passwordToggleEnabled="true">
+                    android:layout_height="wrap_content">
 
-                    <EditText
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/txtPassword"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

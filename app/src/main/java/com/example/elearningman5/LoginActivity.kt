@@ -3,15 +3,14 @@ package com.example.elearningman5
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.text.Html
 import android.util.Log
-import android.widget.Button
-import android.widget.EditText
+import android.util.Patterns
 import android.widget.Toast
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatTextView
+import com.example.elearningman5.databinding.ActivityLoginBinding
 import org.json.JSONException
 import org.json.JSONObject
 import java.time.LocalDateTime
@@ -20,12 +19,8 @@ import java.util.*
 
 // Desain UI: https://badoystudio.com/membuat-login-ui-design-menarik-android/
 class LoginActivity : AppCompatActivity() {
-    private var email: String? = null
-    private var password: String? = null
-    private var etEmail: EditText? = null
-    private var etPassword: EditText? = null
-    private var btnLogin: Button? = null
     private lateinit var localStorage: LocalStorage
+    private lateinit var binding: ActivityLoginBinding
 
     private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
@@ -38,13 +33,9 @@ class LoginActivity : AppCompatActivity() {
         findViewById<AppCompatTextView>(R.id.toolbarTitle).text = "Madrasah Aliyah Negeri 5 Sleman"
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
-
+        binding =  ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         localStorage = LocalStorage(this@LoginActivity)
-
-        etEmail = findViewById(R.id.txtEmail)
-        etPassword = findViewById(R.id.txtPassword)
-        btnLogin = findViewById(R.id.btnLogin)
 
         val builder = this@LoginActivity.let { AlertDialog.Builder(it) }
         builder.setCancelable(false)
@@ -69,30 +60,67 @@ class LoginActivity : AppCompatActivity() {
                 localStorage.setNis("")
                 localStorage.setSesi("")
                 dialog.dismiss()
-                Toast.makeText(this, "Sessi anda sudah habis, silahkan login kembali", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@LoginActivity, "Sessi anda sudah habis, silahkan login kembali", Toast.LENGTH_LONG).show()
             }
         }
 
-        with(btnLogin) {
-            this?.setOnClickListener { checkLogin(dialog) }
+        emailFocusListener()
+        passwordFocusListener()
+        binding.btnLogin.setOnClickListener { checkLogin(dialog) }
+    }
+
+//    https://www.youtube.com/watch?v=Gc0sLf91QeM&t=4s
+    private fun emailFocusListener() {
+        binding.txtEmail.setOnFocusChangeListener { _, focused ->
+            if (!focused) {
+                binding.emailContainer.helperText = validEmail()
+            }
         }
     }
 
+    private fun validEmail(): String? {
+        val emailText = binding.txtEmail.text.toString()
+        if (emailText.isEmpty())
+            return "required"
+        if (! Patterns.EMAIL_ADDRESS.matcher(emailText).matches())
+            return "Invalid Email Address"
+        return null
+    }
+
+    private fun passwordFocusListener() {
+        binding.txtPassword.setOnFocusChangeListener { _, focused ->
+            if (!focused) {
+                binding.passwordContainer.helperText = validPassword()
+            }
+        }
+    }
+
+    private fun validPassword(): String? {
+        val passwordText = binding.txtPassword.text.toString()
+        if (passwordText.isEmpty())
+            return "required"
+        if (passwordText.length < 8)
+            return "Minimum 8 Character Password"
+        return null
+    }
+
     private fun checkLogin(dialog: AlertDialog) {
-        email = etEmail!!.text.toString()
-        password = etPassword!!.text.toString()
-        if (email!!.isEmpty() || password!!.isEmpty()) {
-            alertFail("Email and Password is Required")
-        } else if (password!!.length < 8) {
-            alertFail("Password are not long enough")
-        } else {
+        binding.emailContainer.helperText = validEmail()
+        binding.passwordContainer.helperText = validPassword()
+
+        val validEmail = binding.emailContainer.helperText == null
+        val validPassword = binding.passwordContainer.helperText == null
+
+        if (validEmail && validPassword) {
             dialog.show()
-            sendLogin(dialog)
+            sendLogin(binding.txtEmail.text.toString(), binding.txtPassword.text.toString(), dialog)
+        } else {
+            alertFail("Tolong dicek kembali")
         }
     }
 
     @SuppressLint("SimpleDateFormat")
-    private fun sendLogin(dialog: AlertDialog) {
+    private fun sendLogin(email: String, password: String, dialog: AlertDialog) {
         val params = JSONObject()
 
         try {
@@ -147,8 +175,9 @@ class LoginActivity : AppCompatActivity() {
                         alertFail(response?.getString("message").toString())
                     }
                 }
-                findViewById<EditText>(R.id.txtPassword).text.clear()
                 dialog.dismiss()
+                binding.txtEmail.text?.clear()
+                binding.txtPassword.text?.clear()
             }
         }.start()
     }
@@ -157,7 +186,7 @@ class LoginActivity : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle("Failed")
             .setIcon(R.drawable.ic_warning_24)
-            .setMessage(Html.fromHtml("<font color='#AC1212'>$s</font>"))
+            .setMessage(s)
             .setPositiveButton("OK"
             ) { dialog, _ -> dialog.dismiss() }
             .show()
