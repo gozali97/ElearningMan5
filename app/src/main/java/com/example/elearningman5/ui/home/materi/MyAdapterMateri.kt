@@ -3,7 +3,6 @@ package com.example.elearningman5.ui.home.materi
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,8 +12,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.elearningman5.DownloadFile
 import com.example.elearningman5.R
 import com.example.elearningman5.ui.home.tugas.TugasActivity
-import com.example.elearningman5.String2Date
 import com.example.elearningman5.ui.home.chat.ForumActivity
+import com.example.elearningman5.utcToWib
 import com.google.android.material.internal.ContextUtils.getActivity
 import java.text.SimpleDateFormat
 import java.util.*
@@ -41,10 +40,8 @@ class MyAdapterMateri(
 //        Glide.with(context).load(dataList[position].getDataImage()).into(holder.recImage)
         holder.recMateri.text = dataList[position].getMateri()
         holder.recDesc.text = dataList[position].getDesc()
-        holder.recCreat.text = dataList[position].getWaktu()
-            .String2Date("yyyy-MM-dd'T'HH:mm:ss")
-            ?.let {
-                SimpleDateFormat("EEEE hh:mm a, dd MMMM yyyy", Locale("id", "ID"))
+        holder.recCreat.text = utcToWib(dataList[position].getWaktu()!!)?.let {
+                SimpleDateFormat("EEEE, dd MMMM yyyy", Locale("id", "ID"))
                     .format(it).toString()
             }
 
@@ -75,7 +72,6 @@ class MyAdapterMateri(
         }
 
         holder.recCardChat.setOnClickListener {
-            Log.d("TAG, onBindViewHolder: ", "ini forum diskusi")
             getActivity(context)?.let{
                 it.startActivity(Intent (it, ForumActivity::class.java)
                     .putExtra("key_chat", dataList[holder.adapterPosition].getKeyMateri())

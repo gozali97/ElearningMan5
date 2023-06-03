@@ -31,8 +31,14 @@ class TugasActivity : AppCompatActivity() {
     private lateinit var localStorage: LocalStorage
     private var fileTugas: String? = null
     private var fileSiswa: String? = null
-    private var deatline: Date? = null
     private var detailIdTugas: String? = null
+
+    private var deadline: Date? = null
+    private var mulai: Date? = null
+
+    private val pattern = "yyyy-MM-dd HH:mm:ss"
+    private val formatter = DateTimeFormatter.ofPattern(pattern)
+    private var cekMulai = false
 
     private lateinit var linearLayout: LinearLayout
     // Handler untuk memperbarui waktu setiap detik
@@ -131,50 +137,57 @@ class TugasActivity : AppCompatActivity() {
                             findViewById<TextView>(R.id.judulTugas).text = response.getString("nama_tugas")
                             findViewById<TextView>(R.id.deskripsiTugas).text = response.getString("deskripsi")
 
-                            findViewById<TextView>(R.id.creatTugas).text =
-                                response.getString("created_at").String2Date("yyyy-MM-dd'T'HH:mm:ss")
-                                    ?.let {
+                            findViewById<TextView>(R.id.creatTugas).text = utcToWib(response.getString("created_at"))?.let {
                                         SimpleDateFormat("EEEE hh:mm a, dd MMMM yyyy", Locale("id", "ID"))
                                             .format(it).toString()
                                     }
 
                             fileTugas = response.getString("file_tugas")
                             val waktuSisa = findViewById<TextView>(R.id.waktuSisa)
+                            val sekarang = LocalDateTime.now().minusDays(1).format(formatter).String2Date(pattern)
+                            mulai = response.getString("tanggal_mulai").String2Date(pattern)
 
-                            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                            val sekarang = LocalDateTime.now().minusDays(1).format(formatter).String2Date("yyyy-MM-dd HH:mm:ss")
-                            deatline = response.getString("tanggal_selesai").String2Date("yyyy-MM-dd HH:mm:ss")
+                            if (LocalDateTime.now().format(formatter).String2Date(pattern)?.after(mulai)!!) {
+                                deadline = response.getString("tanggal_selesai").String2Date(pattern)
+                                cekMulai = true
 
-                            if (response.getString("detail_tugas").toString() == "null") {
-                                linearLayout.removeView(findViewById<CardView>(R.id.pdfFileIcon))
-                                linearLayout.removeView(findViewById<Button>(R.id.btnUpdate))
+                                if (response.getString("detail_tugas").toString() == "null") {
+                                    linearLayout.removeView(findViewById<CardView>(R.id.pdfFileIcon))
+                                    linearLayout.removeView(findViewById<Button>(R.id.btnUpdate))
 
-                                if (sekarang?.before(deatline)!!) {
-                                    // Memulai pembaruan waktu secara berkala
-                                    handler.post(updateTimeRunnable)
-                                } else {
-                                    linearLayout.removeView(findViewById<Button>(R.id.btnUpload))
-                                }
-                            } else {
-                                val detailTugas = response.getJSONObject("detail_tugas")
-
-                                linearLayout.removeView(findViewById<Button>(R.id.btnUpload))
-                                fileSiswa = detailTugas.getString("file")
-                                detailIdTugas = detailTugas.getString("id_detail_tugas")
-
-                                if (detailTugas.getInt("nilai") == 0) {
-                                    if (sekarang?.before(deatline)!!) {
+                                    if (sekarang?.before(deadline)!!) {
+                                        // Memulai pembaruan waktu secara berkala
                                         handler.post(updateTimeRunnable)
                                     } else {
-                                        waktuSisa.text = "Guru Belum Memberi Nilai"
-                                        waktuSisa.setTextColor(ContextCompat.getColor(this@TugasActivity, R.color.lavender))
-                                        linearLayout.removeView(findViewById<Button>(R.id.btnUpdate))
+                                        linearLayout.removeView(findViewById<Button>(R.id.btnUpload))
                                     }
                                 } else {
-                                    linearLayout.removeView(findViewById<Button>(R.id.btnUpdate))
-                                    waktuSisa.text = "Nilai: " + detailTugas.getString("nilai")
-                                    waktuSisa.setTextColor(ContextCompat.getColor(this@TugasActivity, R.color.green))
+                                    val detailTugas = response.getJSONObject("detail_tugas")
+
+                                    linearLayout.removeView(findViewById<Button>(R.id.btnUpload))
+                                    fileSiswa = detailTugas.getString("file")
+                                    detailIdTugas = detailTugas.getString("id_detail_tugas")
+
+                                    if (detailTugas.getInt("nilai") == 0) {
+                                        if (sekarang?.before(deadline)!!) {
+                                            handler.post(updateTimeRunnable)
+                                        } else {
+                                            waktuSisa.text = "Guru Belum Memberi Nilai"
+                                            waktuSisa.setTextColor(ContextCompat.getColor(this@TugasActivity, R.color.lavender))
+                                            linearLayout.removeView(findViewById<Button>(R.id.btnUpdate))
+                                        }
+                                    } else {
+                                        linearLayout.removeView(findViewById<Button>(R.id.btnUpdate))
+                                        waktuSisa.text = "Nilai: " + detailTugas.getString("nilai")
+                                        waktuSisa.setTextColor(ContextCompat.getColor(this@TugasActivity, R.color.green))
+                                    }
                                 }
+                            } else {
+                                handler.post(updateTimeRunnable)
+                                cekMulai = false
+                                linearLayout.removeView(findViewById<CardView>(R.id.pdfFileIcon))
+                                linearLayout.removeView(findViewById<CardView>(R.id.btnUpload))
+                                linearLayout.removeView(findViewById<Button>(R.id.btnUpdate))
                             }
                         } catch (e: JSONException) {
                             e.printStackTrace()
@@ -209,18 +222,30 @@ class TugasActivity : AppCompatActivity() {
     private val updateTimeRunnable: Runnable = object : Runnable {
         @SuppressLint("SetTextI18n")
         override fun run() {
-            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-            val timeNow = LocalDateTime.now().minusDays(1).format(formatter).String2Date("yyyy-MM-dd HH:mm:ss")
+            if (cekMulai) {
+                val timeDeadline = LocalDateTime.now().minusDays(1).format(formatter).String2Date(pattern)
 
-            // Menampilkan waktu di TextView
-            findViewById<TextView>(R.id.waktuSisa).text = "Sisa waktu: " + SelisihDateTime(deatline!!,
-                timeNow!!
-            )
+                // Menampilkan waktu di TextView
+                findViewById<TextView>(R.id.waktuSisa).text = "Sisa waktu: " + SelisihDateTime(deadline!!,
+                    timeDeadline!!
+                )
 
-            if (!timeNow.before(deatline)) {
-                // refresh
-                finish()
-                startActivity(intent)
+                if (!timeDeadline.before(deadline)) {
+                    // refresh
+                    finish()
+                    startActivity(intent)
+                }
+            } else {
+                val timeMulai = LocalDateTime.now().format(formatter).String2Date(pattern)
+
+                // Menampilkan waktu di TextView
+                findViewById<TextView>(R.id.waktuSisa).text = "Mulai dalam: " + SelisihDateTime(timeMulai!!, mulai!!)
+
+                if (timeMulai.after(mulai)) {
+                    // refresh
+                    finish()
+                    startActivity(intent)
+                }
             }
 
             // Mengulangi pembaruan waktu setiap detik

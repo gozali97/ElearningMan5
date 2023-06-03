@@ -9,8 +9,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.elearningman5.LocalStorage
 import com.example.elearningman5.R
-import com.example.elearningman5.String2Date
-import com.example.elearningman5.fromMillisToTimeString
 
 private const val TIME_MESSAGE = 0
 private const val VIEW_TYPE_MY_MESSAGE = 1
@@ -104,8 +102,7 @@ class MessageAdapter (private val context: Context) : RecyclerView.Adapter<Messa
 
         override fun bind(message: Message) {
             messageText.text = message.message.trimEnd('\r', '\n')
-            timeText.text = message.time.String2Date("yyyy-MM-dd'T'HH:mm:ss")
-                ?.let { fromMillisToTimeString(it) }
+            timeText.text = message.time
 
 //            onClickListener pada tampilan item
             itemView.setOnClickListener {
@@ -128,8 +125,7 @@ class MessageAdapter (private val context: Context) : RecyclerView.Adapter<Messa
             messageText.text = message.message.trimEnd('\r', '\n')
             userText.text = message.name
             receiverRole.text = "(${ message.receiver_role })"
-            timeText.text = message.time.String2Date("yyyy-MM-dd'T'HH:mm:ss")
-                ?.let { fromMillisToTimeString(it) }
+            timeText.text = message.time
 
             itemView.setOnClickListener {
                 val position = adapterPosition

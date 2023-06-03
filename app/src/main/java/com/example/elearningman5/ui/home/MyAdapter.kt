@@ -30,7 +30,7 @@ class MyAdapter(private val context: Context,
         return MyViewHolder(view)
     }
 
-    @SuppressLint("ResourceType")
+    @SuppressLint("ResourceType", "NotifyDataSetChanged")
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
 //        Glide.with(context).load(dataList[position].getDataImage()).into(holder.recImage)
         holder.recKelas.text = dataList[position].getKelas()

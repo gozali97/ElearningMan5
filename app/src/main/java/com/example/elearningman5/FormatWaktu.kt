@@ -3,15 +3,19 @@ package com.example.elearningman5
 import android.annotation.SuppressLint
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.*
 import kotlin.math.abs
 
 class FormatWaktu {
 }
 
-fun fromMillisToTimeString(millis: Date) : String {
-    val format = SimpleDateFormat("hh:mm a", Locale.getDefault())
-    return format.format(millis)
+fun utcToWib(string_date: String): Date? {
+    val instant = Instant.parse(string_date)
+    val indonesiaDateTime = ZonedDateTime.ofInstant(instant, ZoneId.of("Asia/Jakarta"))
+    return Date.from(indonesiaDateTime.toInstant())
 }
 
 @SuppressLint("SimpleDateFormat")

@@ -22,9 +22,9 @@ import com.example.elearningman5.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.json.JSONException
 import org.json.JSONObject
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.text.SimpleDateFormat
+import java.time.*
 import java.util.*
 
 class ForumActivity : AppCompatActivity(), ItemClickListener {
@@ -33,6 +33,11 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
     private lateinit var messageList: RecyclerView
     private lateinit var visibilityElement: FloatingActionButton
     private lateinit var dialog: AlertDialog
+
+    private val pattern = "yyyy-MM-dd'T'00:00:00"
+    private val format = DateTimeFormatter.ofPattern(pattern)
+    private val kemarin = LocalDateTime.now().format(format).String2Date(pattern)
+    private val lusa = LocalDateTime.now().minusDays(1).format(format).String2Date(pattern)
 
     private var cekHari: Date? = null
     private var keyMessage = 0
@@ -88,8 +93,15 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
                 scrolledToBottom()
 
 //               untuk created_at, updated_at
-                val sekarang = LocalDateTime.now().format(DateTimeFormatter
-                    .ofPattern("yyyy-MM-dd'T'HH:mm:ss"))
+//                val sekarang = LocalDateTime.now().format(DateTimeFormatter
+//                    .ofPattern("yyyy-MM-dd'T'HH:mm:ss"))
+                val indonesiaDateTime = LocalDateTime.now()
+                val utcDateTime = indonesiaDateTime.atZone(ZoneId.of("Asia/Jakarta")).withZoneSameInstant(
+                    ZoneOffset.UTC)
+
+                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'")
+                val sekarang = utcDateTime.format(formatter)
+                
                 setMessage(txtMessage, sekarang)
             } else {
                 Toast.makeText(applicationContext,"Message should not be empty", Toast.LENGTH_SHORT).show()
@@ -131,15 +143,14 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
                         200 -> {
                             try {
                                 if (response?.getJSONArray("data").toString() != "[]") {
-                                    val pattern = "yyyy-MM-dd'T'00:00:00"
-                                    val format = DateTimeFormatter.ofPattern(pattern)
-
-                                    val kemarin = LocalDateTime.now().format(format).String2Date(pattern)
-                                    val lusa = LocalDateTime.now().minusDays(1).format(format).String2Date(pattern)
-
                                     for (i in 0 until (response?.getJSONArray("data")?.length() ?: 0)) {
                                         val item = response?.getJSONArray("data")?.getJSONObject(i)
-                                        val waktu = item?.getString("created_at").String2Date("yyyy-MM-dd'T'HH:mm:ss")
+                                        cekUpdate = true
+                                        keyMessage = item!!.getString("id_diskusi").toInt()
+                                        Log.d(TAG, "$keyMessage getMessage: $item")
+
+                                        val waktu = utcToWib(item.getString("created_at"))
+//                                        val waktu = item?.getString("created_at").String2Date("yyyy-MM-dd'T'HH:mm:ss")
 
                                         if(waktu!!.before(lusa)) {
                                             if (keyMessage == 0) {
@@ -162,10 +173,7 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
                                                 addMessage("Today")
                                             }
                                         }
-
-                                        addMessage(item = item)
-                                        cekUpdate = true
-                                        keyMessage = item!!.getString("id_diskusi").toInt()
+                                        addMessage(waktu = waktu, item = item)
                                     }
                                 } else if (cekUpdate) {
                                     adapter.notifyDataSetChanged()
@@ -243,7 +251,7 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
                     item.getString("name").toString(),
                     item.getString("isi_pesan").toString(),
                     item.getString("receiver_role").toString(),
-                    item.getString("created_at").toString()
+                    SimpleDateFormat("hh:mm a").format(waktu!!).toString()
             ))
         }
     }
