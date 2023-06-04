@@ -23,4 +23,13 @@
     <string name="tugas_anda">Tugas Anda</string>
     <string name="sisa_waktu">Sisa waktu: habis</string>
     <string name="forum_diskusi">Forum Diskusi</string>
+
+    <string name="nama_siswa">Nama Siswa</string>
+    <string name="email_siswa">Email Siswa</string>
+    <string name="hp_siswa">Hp Siswa</string>
+    <string name="address">address</string>
+    <string name="kelas_siswa">Kelas Siswa</string>
+    <string name="jurusan_siswa">Jurusan Siswa</string>
+
+    <string name="password">Password</string>
 </resources>

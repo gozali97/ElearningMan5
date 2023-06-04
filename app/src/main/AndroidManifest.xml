@@ -18,6 +18,14 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31" >
         <activity
+            android:name=".ui.profile.changepass.ChangePasswordActivity"
+            android:exported="false"
+            android:parentActivityName=".UserActivity" />
+        <activity
+            android:name=".ui.profile.editprofile.EditProfileActivity"
+            android:exported="false"
+            android:parentActivityName=".UserActivity" />
+        <activity
             android:name=".ui.home.chat.ForumActivity"
             android:exported="false"
             android:parentActivityName=".UserActivity" />

@@ -11,6 +11,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.example.elearningman5.*
 import com.example.elearningman5.databinding.FragmentProfileBinding
+import com.example.elearningman5.ui.profile.changepass.ChangePasswordActivity
+import com.example.elearningman5.ui.profile.editprofile.EditProfileActivity
 import com.squareup.picasso.Picasso
 import org.json.JSONException
 import org.json.JSONObject
@@ -35,7 +37,6 @@ class ProfileFragment : Fragment() {
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        //////////////
         localStorage = LocalStorage(this.context)
         val builder = context?.let { AlertDialog.Builder(it) }
         val dialog = builder?.create()
@@ -46,8 +47,26 @@ class ProfileFragment : Fragment() {
         dialog?.show()
         dialog?.let { getUser(it) }
 
-        dialog?.show()
-        binding.btnLogout.setOnClickListener{
+        binding.btnEditProfile.setOnClickListener {
+            activity?.let{
+                it.startActivity(Intent (it, EditProfileActivity::class.java)
+                    .putExtra("name", binding.textNama.text)
+                    .putExtra("email", binding.textEmailSiswa.text)
+                    .putExtra("nis", binding.textNis.text)
+                )
+            }
+        }
+
+        binding.btnChangePassword.setOnClickListener {
+            activity?.let{
+                it.startActivity(Intent (it, ChangePasswordActivity::class.java)
+                    .putExtra("email", binding.textEmailSiswa.text)
+                )
+            }
+        }
+
+        binding.btnLogout.setOnClickListener {
+            dialog?.show()
             val url = getString(R.string.api_server) + "/logout"
             Thread {
                 val http = Http(context, url)
@@ -76,7 +95,6 @@ class ProfileFragment : Fragment() {
 
             }.start()
         }
-        //////////////
 
         return root
     }
@@ -128,7 +146,7 @@ class ProfileFragment : Fragment() {
 
                         binding.textKelas.text = "Kelas : ${ response?.getString("nama_kelas")?.uppercase() }"
                         binding.textJurusan.text = "Jurusan : ${ response?.getString("nama_jurusan")?.uppercase() }"
-
+                        binding.textAlamat.text = response?.getString("alamat")
                     } catch (e: JSONException) {
                         e.printStackTrace()
                     }

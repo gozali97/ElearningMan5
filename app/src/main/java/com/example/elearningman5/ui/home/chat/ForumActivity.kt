@@ -6,7 +6,6 @@ import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
-import android.text.Html
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -39,8 +38,9 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
     private val kemarin = LocalDateTime.now().format(format).String2Date(pattern)
     private val lusa = LocalDateTime.now().minusDays(1).format(format).String2Date(pattern)
 
-    private var cekHari: Date? = null
+    private var cekHari: Date? = lusa
     private var keyMessage = 0
+    private var cekAwal = true
 
     private var retryAttempts = 1
     private val maxRetryAttempts = 4
@@ -146,14 +146,14 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
                                     for (i in 0 until (response?.getJSONArray("data")?.length() ?: 0)) {
                                         val item = response?.getJSONArray("data")?.getJSONObject(i)
                                         cekUpdate = true
-                                        keyMessage = item!!.getString("id_diskusi").toInt()
-                                        Log.d(TAG, "$keyMessage getMessage: $item")
 
+                                        keyMessage = item!!.getString("id_diskusi").toInt()
                                         val waktu = utcToWib(item.getString("created_at"))
-//                                        val waktu = item?.getString("created_at").String2Date("yyyy-MM-dd'T'HH:mm:ss")
+//                                        Log.d(TAG, "$keyMessage getMessage: $item")
 
                                         if(waktu!!.before(lusa)) {
-                                            if (keyMessage == 0) {
+                                            if (cekAwal) {
+                                                cekAwal = false
                                                 addMessage(pattern, waktu)
                                                 Toast.makeText(this@ForumActivity, "Mohon Tunggu Sebentar", Toast.LENGTH_LONG).show()
                                             }
@@ -376,7 +376,7 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
         AlertDialog.Builder(this)
             .setTitle("Failed")
             .setIcon(R.drawable.ic_warning_24)
-            .setMessage(Html.fromHtml("<font color='#AC1212'>$s</font>"))
+            .setMessage(s)
             .setPositiveButton("OK"
             ) { dialog, _ -> dialog.dismiss() }
             .show()
