@@ -46,6 +46,8 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/proxima_nova_reg"
                     android:hint="@string/nama_siswa"
+                    android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                    android:textAllCaps="true"
                     android:maxLength="35"
                     android:lines="1"
                     android:textColor="@color/lavender"
@@ -58,6 +60,8 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:counterEnabled="true"
+                app:counterMaxLength="12"
                 app:helperTextTextColor="#CC0000">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -66,7 +70,8 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/proxima_nova_reg"
                     android:hint="@string/hp_siswa"
-                    android:maxLength="15"
+                    android:inputType="number"
+                    android:maxLength="14"
                     android:lines="1"
                     android:textColor="@color/lavender"
                     android:textSize="20sp" />

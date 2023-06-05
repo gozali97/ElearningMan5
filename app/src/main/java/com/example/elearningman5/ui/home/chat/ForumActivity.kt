@@ -315,21 +315,21 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
                     }
                     422 -> {
                         try {
-                            response?.let { alertFail(it.getString("message")) }
+                            response?.let { alertFail(it.getString("message"), this@ForumActivity) }
                         } catch (e: JSONException) {
                             e.printStackTrace()
                         }
                     }
                     401 -> {
                         try {
-                            response?.let { alertFail(it.getString("message")) }
+                            response?.let { alertFail(it.getString("message"), this@ForumActivity) }
                         } catch (e: JSONException) {
                             e.printStackTrace()
                         }
                     }
                     else -> {
                         Log.d("TAG, Forum: ", code.toString())
-                        alertFail(response?.getString("message").toString())
+                        alertFail(response?.getString("message").toString(), this@ForumActivity)
                     }
                 }
             }
@@ -370,15 +370,5 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
         super.onDestroy()
         // Menghentikan pembaruan waktu saat Activity dihancurkan
         handler.removeCallbacks(updateTimeRunnable)
-    }
-
-    private fun alertFail(s: String) {
-        AlertDialog.Builder(this)
-            .setTitle("Failed")
-            .setIcon(R.drawable.ic_warning_24)
-            .setMessage(s)
-            .setPositiveButton("OK"
-            ) { dialog, _ -> dialog.dismiss() }
-            .show()
     }
 }

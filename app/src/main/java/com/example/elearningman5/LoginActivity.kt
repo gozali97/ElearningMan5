@@ -83,7 +83,7 @@ class LoginActivity : AppCompatActivity() {
         if (emailText.isEmpty())
             return "required"
         if (! Patterns.EMAIL_ADDRESS.matcher(emailText).matches())
-            return "Invalid Email Address"
+            return "invalid Email Address"
         return null
     }
 
@@ -100,7 +100,7 @@ class LoginActivity : AppCompatActivity() {
         if (passwordText.isEmpty())
             return "required"
         if (passwordText.length < 8)
-            return "Minimum 8 Character Password"
+            return "minimum 8 Character Password"
         return null
     }
 
@@ -115,7 +115,7 @@ class LoginActivity : AppCompatActivity() {
             dialog.show()
             sendLogin(binding.txtEmail.text.toString(), binding.txtPassword.text.toString(), dialog)
         } else {
-            alertFail("Tolong dicek kembali")
+            alertFail("Tolong dicek kembali", this@LoginActivity)
         }
     }
 
@@ -158,21 +158,21 @@ class LoginActivity : AppCompatActivity() {
                     }
                     422 -> {
                         try {
-                            response?.let { alertFail(it.getString("message")) }
+                            response?.let { alertFail(it.getString("message"), this@LoginActivity) }
                         } catch (e: JSONException) {
                             e.printStackTrace()
                         }
                     }
                     401 -> {
                         try {
-                            response?.let { alertFail(it.getString("message")) }
+                            response?.let { alertFail(it.getString("message"), this@LoginActivity) }
                         } catch (e: JSONException) {
                             e.printStackTrace()
                         }
                     }
                     else -> {
                         Log.d("TAG, sendLogin: ", code.toString())
-                        alertFail(response?.getString("message").toString())
+                        alertFail(response?.getString("message").toString(), this@LoginActivity)
                     }
                 }
                 dialog.dismiss()
@@ -180,15 +180,5 @@ class LoginActivity : AppCompatActivity() {
                 binding.txtPassword.text?.clear()
             }
         }.start()
-    }
-
-    private fun alertFail(s: String) {
-        AlertDialog.Builder(this)
-            .setTitle("Failed")
-            .setIcon(R.drawable.ic_warning_24)
-            .setMessage(s)
-            .setPositiveButton("OK"
-            ) { dialog, _ -> dialog.dismiss() }
-            .show()
     }
 }
