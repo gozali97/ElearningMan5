@@ -18,6 +18,10 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import com.example.elearningman5.*
+import com.example.elearningman5.pelengkap.DownloadFile
+import com.example.elearningman5.pelengkap.SelisihDateTime
+import com.example.elearningman5.pelengkap.String2Date
+import com.example.elearningman5.pelengkap.utcToWib
 import org.json.JSONException
 import org.json.JSONObject
 import java.text.SimpleDateFormat
@@ -276,6 +280,7 @@ class TugasActivity : AppCompatActivity() {
 
                 try {
                     params.put("detail_id", detailIdTugas)
+                    params.put("siswa_id", localStorage.getNis().toString())
                 } catch (e: JSONException) {
                     e.printStackTrace()
                 }

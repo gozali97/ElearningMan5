@@ -2,6 +2,7 @@ package com.example.elearningman5
 
 import android.content.Context
 import android.net.Uri
+import android.webkit.MimeTypeMap
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.DataOutputStream
@@ -17,7 +18,7 @@ class UTask(
     private var url: String?)
 {
     private var context: Context?
-    private lateinit var fileUri: Uri
+    private var fileUri: Uri? = null
     private var dataKey: String? = null
     private var response: String? = null
     private var statusCode = 0
@@ -27,7 +28,7 @@ class UTask(
         this.context = context
     }
 
-    fun setDataFile(fileUri: Uri) {
+    fun setDataFile(fileUri: Uri?) {
         this.fileUri = fileUri
     }
 
@@ -63,24 +64,31 @@ class UTask(
             // membuka stream keluaran untuk menulis ke permintaan
             val outputStream = DataOutputStream(connection.outputStream)
 
-            // file PDF
-            outputStream.writeBytes("--$boundary\r\n")
-            outputStream.writeBytes("Content-Disposition: form-data; name=\"file\"; filename=\"$fileName\"\r\n")
-            outputStream.writeBytes("Content-Type: application/pdf\r\n\r\n")
+            if (fileUri != null) {
+                // Mendapatkan tipe konten dari file
+                val fileExtension = MimeTypeMap.getFileExtensionFromUrl(fileUri.toString())
+                val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension)
 
-            val inputStream = context?.contentResolver?.openInputStream(fileUri)
-            val buffer = ByteArray(10 * 1024 * 1024)
-            var bytesRead = -1
-            var totalBytesRead = 0
+                // Mengganti Content-Type sesuai dengan tipe konten file
+                outputStream.writeBytes("--$boundary\r\n")
+                outputStream.writeBytes("Content-Disposition: form-data; name=\"file\"; filename=\"$fileName\"\r\n")
+                outputStream.writeBytes("Content-Type: $mimeType\r\n\r\n")
 
-            while (inputStream!!.read(buffer).also { bytesRead = it } != -1) {
-                outputStream.write(buffer, 0, bytesRead)
-                totalBytesRead += bytesRead
-                if (totalBytesRead > (10 * 1024 * 1024)) { // Melebihi // 10 MB (10 x 1024 x 1024 = 10485760 byte)
-                    throw Exception("File terlalu besar")
+                val inputStream = context?.contentResolver?.openInputStream(fileUri!!)
+                val buffer = ByteArray(10 * 1024 * 1024)
+                var bytesRead = -1
+                var totalBytesRead = 0
+
+                while (inputStream!!.read(buffer).also { bytesRead = it } != -1) {
+                    outputStream.write(buffer, 0, bytesRead)
+                    totalBytesRead += bytesRead
+                    if (totalBytesRead > (10 * 1024 * 1024)) { // Melebihi // 10 MB (10 x 1024 x 1024 = 10485760 byte)
+                        throw Exception("File terlalu besar")
+                    }
                 }
+                outputStream.writeBytes("\r\n")
+                inputStream.close()
             }
-            outputStream.writeBytes("\r\n")
 
             val jsonObject = dataKey?.let { JSONObject(it) }
 
@@ -92,7 +100,6 @@ class UTask(
 
             // menutup permintaan
             outputStream.writeBytes("--$boundary--\r\n")
-            inputStream.close()
             outputStream.flush()
             outputStream.close()
 

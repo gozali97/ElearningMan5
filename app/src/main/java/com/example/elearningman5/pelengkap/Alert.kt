@@ -1,7 +1,8 @@
-package com.example.elearningman5
+package com.example.elearningman5.pelengkap
 
 import android.content.Context
 import androidx.appcompat.app.AlertDialog
+import com.example.elearningman5.R
 
 class alert {
 }

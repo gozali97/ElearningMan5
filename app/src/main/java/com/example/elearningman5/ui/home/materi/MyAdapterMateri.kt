@@ -9,11 +9,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.elearningman5.DownloadFile
+import com.example.elearningman5.pelengkap.DownloadFile
 import com.example.elearningman5.R
+import com.example.elearningman5.pelengkap.utcToWib
 import com.example.elearningman5.ui.home.tugas.TugasActivity
 import com.example.elearningman5.ui.home.chat.ForumActivity
-import com.example.elearningman5.utcToWib
 import com.google.android.material.internal.ContextUtils.getActivity
 import java.text.SimpleDateFormat
 import java.util.*

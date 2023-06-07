@@ -65,6 +65,7 @@
             app:cardElevation="4dp">
 
             <ImageView
+                android:contentDescription="Download Tugas"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:src="@drawable/documents"/>
@@ -81,8 +82,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
-                android:text="@string/tugas_anda"
                 android:fontFamily="sans-serif-medium"
+                android:text="@string/tugas_anda"
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -118,6 +119,7 @@
                     app:cardElevation="4dp" >
 
                     <ImageView
+                        android:contentDescription="Download Tugas Siswa"
                         android:layout_width="100dp"
                         android:layout_height="100dp"
                         android:src="@drawable/pdf" />

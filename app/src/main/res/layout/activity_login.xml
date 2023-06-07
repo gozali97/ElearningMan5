@@ -44,6 +44,7 @@
                 android:orientation="horizontal">
 
                 <ImageView
+                    android:contentDescription="logoEmail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:srcCompat="@drawable/baseline_email_24" />
@@ -75,6 +76,7 @@
                 android:orientation="horizontal">
 
                 <ImageView
+                    android:contentDescription="logoKunci"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:srcCompat="@drawable/baseline_lock_24" />
@@ -114,7 +116,8 @@
         </LinearLayout>
     </RelativeLayout>
 
-    <ImageButton
+    <ImageView
+        android:contentDescription="@string/imageman5"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_below="@+id/viewAtas"

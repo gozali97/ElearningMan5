@@ -1,13 +1,14 @@
 package com.example.elearningman5.ui.profile
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.example.elearningman5.*
 import com.example.elearningman5.databinding.FragmentProfileBinding
@@ -21,9 +22,15 @@ import java.util.*
 
 //Desain UI: https://github.com/theindianappguy/SampleProfileUi
 class ProfileFragment : Fragment() {
-
     private var _binding: FragmentProfileBinding? = null
     private lateinit var localStorage: LocalStorage
+
+    private var id: String? = null
+    private var email: String? = null
+
+    companion object {
+        private const val REQUEST_CODE = 1
+    }
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -38,35 +45,22 @@ class ProfileFragment : Fragment() {
         val root: View = binding.root
 
         localStorage = LocalStorage(this.context)
-        val builder = context?.let { AlertDialog.Builder(it) }
-        val dialog = builder?.create()
-
-        builder?.setCancelable(false)
-        builder?.setView(R.layout.progress_layout)
-
-        dialog?.show()
-        dialog?.let { getUser(it) }
+        getUser()
 
         binding.btnEditProfile.setOnClickListener {
-            activity?.let{
-                it.startActivity(Intent (it, EditProfileActivity::class.java)
-                    .putExtra("name", binding.textNama.text)
-                    .putExtra("email", binding.textEmailSiswa.text)
-                    .putExtra("nis", binding.textNis.text)
-                )
-            }
+            openActivityForResult()
         }
 
         binding.btnChangePassword.setOnClickListener {
             activity?.let{
                 it.startActivity(Intent (it, ChangePasswordActivity::class.java)
-                    .putExtra("email", binding.textEmailSiswa.text)
+                    .putExtra("id", id)
+                    .putExtra("email", email)
                 )
             }
         }
 
         binding.btnLogout.setOnClickListener {
-            dialog?.show()
             val url = getString(R.string.api_server) + "/logout"
             Thread {
                 val http = Http(context, url)
@@ -86,9 +80,7 @@ class ProfileFragment : Fragment() {
                         } catch (e: JSONException) {
                             e.printStackTrace()
                         }
-                        dialog?.dismiss()
                     } else {
-                        dialog?.dismiss()
                         Toast.makeText(context, "Error $code", Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -99,13 +91,31 @@ class ProfileFragment : Fragment() {
         return root
     }
 
+    @Suppress("DEPRECATION")
+    private fun openActivityForResult() {
+        val intent = Intent(activity, EditProfileActivity::class.java).putExtra("email", email)
+        startActivityForResult(intent, REQUEST_CODE)
+    }
+
+    @Suppress("DEPRECATION")
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            // Tangkap data dari activity dan lakukan pemrosesan sesuai kebutuhan
+            Log.d("TAG, onActivityResult: ", data?.getStringExtra("result_key").toString())
+            if (data?.getStringExtra("result_key").toString() == "refresh")
+                getUser()
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
     @SuppressLint("SetTextI18n")
-    private fun getUser(it: AlertDialog) {
+    private fun getUser() {
         val params = JSONObject()
         try {
             params.put("email", localStorage.getEmail().toString())
@@ -134,6 +144,7 @@ class ProfileFragment : Fragment() {
                             .error(R.drawable.profile_user)
                             .resize(300, 300)
                             .centerCrop()
+                            .skipMemoryCache()
                             .into(binding.recProfile)
 
                         binding.textNama.text =
@@ -141,7 +152,10 @@ class ProfileFragment : Fragment() {
                                 ?.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }}"
                         binding.textNis.text = "${ response?.getString("nis") }"
 
-                        binding.textEmailSiswa.text = "Email : ${ response?.getString("email") }"
+                        id = response?.getString("id")
+                        email = response?.getString("email")
+
+                        binding.textEmailSiswa.text = "Email : $email"
                         binding.textNoHp.text = "No. Hp : ${ response?.getString("no_hp") }"
 
                         binding.textKelas.text = "Kelas : ${ response?.getString("nama_kelas")?.uppercase() }"
@@ -150,9 +164,7 @@ class ProfileFragment : Fragment() {
                     } catch (e: JSONException) {
                         e.printStackTrace()
                     }
-                    it.dismiss()
                 } else {
-                    it.dismiss()
                     Toast.makeText(context, "Error $code", Toast.LENGTH_SHORT).show()
                 }
             }
