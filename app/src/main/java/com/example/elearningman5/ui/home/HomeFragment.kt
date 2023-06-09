@@ -1,6 +1,7 @@
 package com.example.elearningman5.ui.home
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,8 +13,10 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.elearningman5.Http
 import com.example.elearningman5.LocalStorage
+import com.example.elearningman5.MainActivity
 import com.example.elearningman5.R
 import com.example.elearningman5.databinding.FragmentHomeBinding
+import com.example.elearningman5.pelengkap.kode401
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import org.json.JSONException
@@ -86,31 +89,42 @@ class HomeFragment : Fragment() {
         Thread {
             val http = Http(context, url)
             http.setMethod("post")
+            http.setToken(true)
             http.setData(data)
             http.send()
+
             activity?.runOnUiThread {
                 dataList.clear()
 
                 val code = http.getStatusCode()
-                if (code == 200) {
-                    try {
-                        val response =
-                            http.getResponse()?.let { JSONObject(it).getJSONArray("data").toString() }
-                        val gson = Gson()
+                val response = http.getResponse()?.let { JSONObject(it) }
+                when (code) {
+                    200 -> {
+                        try {
+                            val gson = Gson()
 
-                        val dataClass = object : TypeToken<ArrayList<DataClass>>() {}.type
-                        val addDataMapel: ArrayList<DataClass> = gson.fromJson(response, dataClass)
+                            val dataClass = object : TypeToken<ArrayList<DataClass>>() {}.type
+                            val addDataMapel: ArrayList<DataClass> = gson.fromJson(
+                                response?.getJSONArray("data").toString(), dataClass)
 
-                        dataList.addAll(addDataMapel)
-                        adapter!!.notifyDataSetChanged()
-                    } catch (e: JSONException) {
-                        e.printStackTrace()
+                            dataList.addAll(addDataMapel)
+                            adapter!!.notifyDataSetChanged()
+                        } catch (e: JSONException) {
+                            e.printStackTrace()
+                        }
                     }
-                    dialog.dismiss()
-                } else {
-                    dialog.dismiss()
-                    Toast.makeText(context, "Error $code", Toast.LENGTH_SHORT).show()
+                    401 -> {
+                        context?.let { it1 -> kode401(response!!.getString("message"), it1) }
+                        localStorage.setToken("")
+
+                        startActivity(Intent(context, MainActivity::class.java))
+                        requireActivity().finish()
+                    }
+                    else -> {
+                        Toast.makeText(context, "Error $code (${ response?.getString("message")})", Toast.LENGTH_SHORT).show()
+                    }
                 }
+                dialog.dismiss()
             }
         }.start()
     }

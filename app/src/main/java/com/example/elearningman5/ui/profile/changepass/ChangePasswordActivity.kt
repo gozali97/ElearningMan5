@@ -1,7 +1,7 @@
 package com.example.elearningman5.ui.profile.changepass
 
-import android.content.ContentValues.TAG
 import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +10,7 @@ import android.widget.Toast
 import com.example.elearningman5.*
 import com.example.elearningman5.databinding.ActivityChangePasswordBinding
 import com.example.elearningman5.pelengkap.alertFail
+import com.example.elearningman5.pelengkap.kode401
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -70,8 +71,6 @@ class ChangePasswordActivity : AppCompatActivity() {
         val params = JSONObject()
 
         try {
-            params.put("id", intent.extras?.getString("id"))
-            params.put("email", intent.extras?.getString("email"))
             params.put("password", binding.txtOldPassword.text)
             params.put("new_password", binding.txtNewPassword.text)
             params.put("confirm_password", binding.txtConfirmPassword.text)
@@ -79,12 +78,13 @@ class ChangePasswordActivity : AppCompatActivity() {
             e.printStackTrace()
         }
         val data = params.toString()
-        val url = getString(R.string.api_server) + "/profil/updatePassword"
+        val url = getString(R.string.api_server) + "/profile/updatePassword"
 
         Thread {
             var response: JSONObject? = null
             val http = Http(this@ChangePasswordActivity, url)
             http.setMethod("post")
+            http.setToken(true)
             http.setData(data)
             http.send()
 
@@ -108,11 +108,11 @@ class ChangePasswordActivity : AppCompatActivity() {
                             }
                         }
                         401 -> {
-                            try {
-                                Toast.makeText(this@ChangePasswordActivity, response?.getString("message"), Toast.LENGTH_SHORT).show()
-                            } catch (e: JSONException) {
-                                e.printStackTrace()
-                            }
+                            kode401(response!!.getString("message"), this)
+                            LocalStorage(this).setToken("")
+
+                            startActivity(Intent(this, MainActivity::class.java))
+                            finish()
                         }
                         else -> {
                             Log.d("TAG, Forum: ", "$code ${response?.getString("message").toString()}")
@@ -121,9 +121,8 @@ class ChangePasswordActivity : AppCompatActivity() {
                     }
                 } catch (e: JSONException) {
                     e.printStackTrace()
-                    Log.d(TAG, "getMessage: ${response?.getString("message")}")
                     // kesalahan parsing JSON
-                    Toast.makeText(this@ChangePasswordActivity, "Tunggu Sebentar", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@ChangePasswordActivity, response?.getString("message"), Toast.LENGTH_SHORT).show()
                 }
             }
         }.start()

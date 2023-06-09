@@ -3,6 +3,7 @@ package com.example.elearningman5.ui.home.chat
 import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
 import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -18,9 +19,7 @@ import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.elearningman5.*
-import com.example.elearningman5.pelengkap.String2Date
-import com.example.elearningman5.pelengkap.alertFail
-import com.example.elearningman5.pelengkap.utcToWib
+import com.example.elearningman5.pelengkap.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.json.JSONException
 import org.json.JSONObject
@@ -95,18 +94,7 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
             if (txtMessage.text.isNotEmpty()) {
                 hideKeyboard()
                 scrolledToBottom()
-
-//               untuk created_at, updated_at
-//                val sekarang = LocalDateTime.now().format(DateTimeFormatter
-//                    .ofPattern("yyyy-MM-dd'T'HH:mm:ss"))
-                val indonesiaDateTime = LocalDateTime.now()
-                val utcDateTime = indonesiaDateTime.atZone(ZoneId.of("Asia/Jakarta")).withZoneSameInstant(
-                    ZoneOffset.UTC)
-
-                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'")
-                val sekarang = utcDateTime.format(formatter)
-                
-                setMessage(txtMessage, sekarang)
+                setMessage(txtMessage)
             } else {
                 Toast.makeText(applicationContext,"Message should not be empty", Toast.LENGTH_SHORT).show()
             }
@@ -137,6 +125,7 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
             var response: JSONObject? = null
             val http = Http(this@ForumActivity, urlForum)
             http.setMethod("post")
+            http.setToken(true)
             http.setData(data)
             http.send()
 
@@ -153,7 +142,6 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
 
                                         keyMessage = item!!.getString("id_diskusi").toInt()
                                         val waktu = utcToWib(item.getString("created_at"))
-//                                        Log.d(TAG, "$keyMessage getMessage: $item")
 
                                         if(waktu!!.before(lusa)) {
                                             if (cekAwal) {
@@ -192,6 +180,7 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
                             }
                         }
                         422 -> {
+                            dialog.dismiss()
                             try {
                                 Toast.makeText(this@ForumActivity, response?.getString("message"), Toast.LENGTH_SHORT).show()
                             } catch (e: JSONException) {
@@ -199,22 +188,25 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
                             }
                         }
                         401 -> {
-                            try {
-                                Toast.makeText(this@ForumActivity, response?.getString("message"), Toast.LENGTH_SHORT).show()
-                            } catch (e: JSONException) {
-                                e.printStackTrace()
-                            }
+                            dialog.dismiss()
+                            kode401(response!!.getString("message"), this)
+                            localStorage.setToken("")
+
+                            startActivity(Intent(this, MainActivity::class.java))
+                            finish()
                         }
                         429 -> {
                             Toast.makeText(this@ForumActivity, response?.getString("message"), Toast.LENGTH_SHORT).show()
                             makeRequestWithExponentialBackoff()
                         }
                         else -> {
+                            dialog.dismiss()
                             Log.d("TAG, Forum: ", "$code ${response?.getString("message").toString()}")
                             Toast.makeText(this@ForumActivity, response?.getString("message"), Toast.LENGTH_SHORT).show()
                         }
                     }
                 } catch (e: JSONException) {
+                    dialog.dismiss()
                     e.printStackTrace()
                     Log.d(TAG, "getMessage: ${response?.getString("message")}")
                     // kesalahan parsing JSON
@@ -285,15 +277,13 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
         }
     }
 
-    private fun setMessage(txtMessage: EditText, sekarang: String) {
+    private fun setMessage(txtMessage: EditText) {
         val urlForum = getString(R.string.api_server) + "/materi/addDiskusi"
         val paramsForum = JSONObject()
 
         try {
             paramsForum.put("materi_id", intent.extras?.getString("key_chat"))
             paramsForum.put("isi_pesan", txtMessage.text.toString())
-            paramsForum.put("email", localStorage.getEmail())
-            paramsForum.put("waktu_pesan", sekarang)
         } catch (e: JSONException) {
             e.printStackTrace()
         }
@@ -302,6 +292,7 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
         Thread {
             val http = Http(this@ForumActivity, urlForum)
             http.setMethod("post")
+            http.setToken(true)
             http.setData(data)
             http.send()
 
@@ -325,11 +316,11 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
                         }
                     }
                     401 -> {
-                        try {
-                            response?.let { alertFail(it.getString("message"), this@ForumActivity) }
-                        } catch (e: JSONException) {
-                            e.printStackTrace()
-                        }
+                        kode401(response!!.getString("message"), this)
+                        localStorage.setToken("")
+
+                        startActivity(Intent(this, MainActivity::class.java))
+                        finish()
                     }
                     else -> {
                         Log.d("TAG, Forum: ", code.toString())

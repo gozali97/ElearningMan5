@@ -18,10 +18,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import com.example.elearningman5.*
-import com.example.elearningman5.pelengkap.DownloadFile
-import com.example.elearningman5.pelengkap.SelisihDateTime
-import com.example.elearningman5.pelengkap.String2Date
-import com.example.elearningman5.pelengkap.utcToWib
+import com.example.elearningman5.pelengkap.*
 import org.json.JSONException
 import org.json.JSONObject
 import java.text.SimpleDateFormat
@@ -45,6 +42,7 @@ class TugasActivity : AppCompatActivity() {
     private var cekMulai = false
 
     private lateinit var linearLayout: LinearLayout
+
     // Handler untuk memperbarui waktu setiap detik
     private val handler = Handler()
 
@@ -56,7 +54,8 @@ class TugasActivity : AppCompatActivity() {
             setDisplayHomeAsUpEnabled(true)
             setHomeAsUpIndicator(R.drawable.baseline_arrow_back_24)
         }
-        findViewById<AppCompatTextView>(R.id.toolbarTitle).text = "Tugas ${intent.extras?.getString("nama_materi")}"
+        findViewById<AppCompatTextView>(R.id.toolbarTitle).text =
+            "Tugas ${intent.extras?.getString("nama_materi")}"
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tugas)
@@ -94,19 +93,21 @@ class TugasActivity : AppCompatActivity() {
         }
 
         recCardFileTugas.setOnClickListener {
-            if (! fileTugas?.isEmpty()!!) {
+            if (!fileTugas?.isEmpty()!!) {
 //                download(getString(R.string.api_server).trimEnd('/') + "/assets/tugas/$fileTugas",
-                DownloadFile.download(this@TugasActivity, getString(R.string.api_server)
-                    .replace("/api", "/assets/tugas/$fileTugas"),
+                DownloadFile.download(
+                    this@TugasActivity, getString(R.string.api_server)
+                        .replace("/api", "/assets/tugas/$fileTugas"),
                     fileTugas!!
                 )
             }
         }
 
         pdfFileIcon.setOnClickListener {
-            if (! fileSiswa?.isEmpty()!!) {
-                DownloadFile.download(this@TugasActivity, getString(R.string.api_server)
-                    .replace("/api", "/assets/tugas-siswa/$fileSiswa"),
+            if (!fileSiswa?.isEmpty()!!) {
+                DownloadFile.download(
+                    this@TugasActivity, getString(R.string.api_server)
+                        .replace("/api", "/assets/tugas-siswa/$fileSiswa"),
                     fileSiswa!!
                 )
             }
@@ -128,6 +129,7 @@ class TugasActivity : AppCompatActivity() {
         Thread {
             val http = Http(this@TugasActivity, url)
             http.setMethod("post")
+            http.setToken(true)
             http.setData(data)
             http.send()
 
@@ -138,21 +140,31 @@ class TugasActivity : AppCompatActivity() {
                         try {
                             response = response?.getJSONObject("data") as JSONObject
 
-                            findViewById<TextView>(R.id.judulTugas).text = response.getString("nama_tugas")
-                            findViewById<TextView>(R.id.deskripsiTugas).text = response.getString("deskripsi")
+                            findViewById<TextView>(R.id.judulTugas).text =
+                                response.getString("nama_tugas")
+                            findViewById<TextView>(R.id.deskripsiTugas).text =
+                                response.getString("deskripsi")
 
-                            findViewById<TextView>(R.id.creatTugas).text = utcToWib(response.getString("created_at"))?.let {
-                                        SimpleDateFormat("EEEE hh:mm a, dd MMMM yyyy", Locale("id", "ID"))
-                                            .format(it).toString()
-                                    }
+                            findViewById<TextView>(R.id.creatTugas).text =
+                                utcToWib(response.getString("created_at"))?.let {
+                                    SimpleDateFormat(
+                                        "EEEE hh:mm a, dd MMMM yyyy",
+                                        Locale("id", "ID")
+                                    )
+                                        .format(it).toString()
+                                }
 
                             fileTugas = response.getString("file_tugas")
                             val waktuSisa = findViewById<TextView>(R.id.waktuSisa)
-                            val sekarang = LocalDateTime.now().minusDays(1).format(formatter).String2Date(pattern)
+                            val sekarang = LocalDateTime.now().minusDays(1).format(formatter)
+                                .String2Date(pattern)
                             mulai = response.getString("tanggal_mulai").String2Date(pattern)
 
-                            if (LocalDateTime.now().format(formatter).String2Date(pattern)?.after(mulai)!!) {
-                                deadline = response.getString("tanggal_selesai").String2Date(pattern)
+                            if (LocalDateTime.now().format(formatter).String2Date(pattern)
+                                    ?.after(mulai)!!
+                            ) {
+                                deadline =
+                                    response.getString("tanggal_selesai").String2Date(pattern)
                                 cekMulai = true
 
                                 if (response.getString("detail_tugas").toString() == "null") {
@@ -177,13 +189,23 @@ class TugasActivity : AppCompatActivity() {
                                             handler.post(updateTimeRunnable)
                                         } else {
                                             waktuSisa.text = "Guru Belum Memberi Nilai"
-                                            waktuSisa.setTextColor(ContextCompat.getColor(this@TugasActivity, R.color.lavender))
+                                            waktuSisa.setTextColor(
+                                                ContextCompat.getColor(
+                                                    this@TugasActivity,
+                                                    R.color.lavender
+                                                )
+                                            )
                                             linearLayout.removeView(findViewById<Button>(R.id.btnUpdate))
                                         }
                                     } else {
                                         linearLayout.removeView(findViewById<Button>(R.id.btnUpdate))
                                         waktuSisa.text = "Nilai: " + detailTugas.getString("nilai")
-                                        waktuSisa.setTextColor(ContextCompat.getColor(this@TugasActivity, R.color.green))
+                                        waktuSisa.setTextColor(
+                                            ContextCompat.getColor(
+                                                this@TugasActivity,
+                                                R.color.green
+                                            )
+                                        )
                                     }
                                 }
                             } else {
@@ -199,22 +221,24 @@ class TugasActivity : AppCompatActivity() {
                     }
                     422 -> {
                         try {
-                            response?.let { alertFail(it.getString("message")) }
+                            response?.let { alertFail(it.getString("message"), this) }
                         } catch (e: JSONException) {
                             e.printStackTrace()
                         }
                     }
                     401 -> {
-                        try {
-                            response?.let { alertFail(it.getString("message")) }
-                        } catch (e: JSONException) {
-                            e.printStackTrace()
-                        }
+                        kode401(response!!.getString("message"), this)
+                        localStorage.setToken("")
+
+                        startActivity(Intent(this, MainActivity::class.java))
+                        finish()
                     }
                     else -> {
-                        Toast.makeText(this@TugasActivity, "Error $code --> ${
-                            response?.getString("message")
-                        }", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@TugasActivity, "Error $code --> ${
+                                response?.getString("message")
+                            }", Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
                 dialog.dismiss()
@@ -227,10 +251,12 @@ class TugasActivity : AppCompatActivity() {
         @SuppressLint("SetTextI18n")
         override fun run() {
             if (cekMulai) {
-                val timeDeadline = LocalDateTime.now().minusDays(1).format(formatter).String2Date(pattern)
+                val timeDeadline =
+                    LocalDateTime.now().minusDays(1).format(formatter).String2Date(pattern)
 
                 // Menampilkan waktu di TextView
-                findViewById<TextView>(R.id.waktuSisa).text = "Sisa waktu: " + SelisihDateTime(deadline!!,
+                findViewById<TextView>(R.id.waktuSisa).text = "Sisa waktu: " + SelisihDateTime(
+                    deadline!!,
                     timeDeadline!!
                 )
 
@@ -243,7 +269,8 @@ class TugasActivity : AppCompatActivity() {
                 val timeMulai = LocalDateTime.now().format(formatter).String2Date(pattern)
 
                 // Menampilkan waktu di TextView
-                findViewById<TextView>(R.id.waktuSisa).text = "Mulai dalam: " + SelisihDateTime(timeMulai!!, mulai!!)
+                findViewById<TextView>(R.id.waktuSisa).text =
+                    "Mulai dalam: " + SelisihDateTime(timeMulai!!, mulai!!)
 
                 if (timeMulai.after(mulai)) {
                     // refresh
@@ -296,6 +323,8 @@ class TugasActivity : AppCompatActivity() {
             uploadTask.setDataFile(fileUri)
             uploadTask.setFileName(getNameFile(fileUri))
             uploadTask.setDataKey(params.toString())
+
+            uploadTask.setToken(true)
             uploadTask.send()
 
             runOnUiThread {
@@ -304,7 +333,11 @@ class TugasActivity : AppCompatActivity() {
                     200 -> {
                         try {
                             // refresh
-                            Toast.makeText(this@TugasActivity, "File tugas berhasil di-upload", Toast.LENGTH_LONG).show()
+                            Toast.makeText(
+                                this@TugasActivity,
+                                "File tugas berhasil di-upload",
+                                Toast.LENGTH_LONG
+                            ).show()
                             finish()
                             startActivity(intent)
                         } catch (e: JSONException) {
@@ -313,20 +346,24 @@ class TugasActivity : AppCompatActivity() {
                     }
                     422 -> {
                         try {
-                            response?.let { alertFail(it.getString("message")) }
+                            response?.let { alertFail(it.getString("message"), this) }
                         } catch (e: JSONException) {
                             e.printStackTrace()
                         }
                     }
                     401 -> {
-                        try {
-                            response?.let { alertFail(it.getString("message")) }
-                        } catch (e: JSONException) {
-                            e.printStackTrace()
-                        }
+                        kode401(response!!.getString("message"), this)
+                        localStorage.setToken("")
+
+                        startActivity(Intent(this, MainActivity::class.java))
+                        finish()
                     }
                     else -> {
-                        Toast.makeText(this@TugasActivity, "Error $code, ${response?.getString("message")}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@TugasActivity,
+                            "Error $code, ${response?.getString("message")}",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
@@ -362,15 +399,5 @@ class TugasActivity : AppCompatActivity() {
         // Menghentikan pembaruan waktu saat Activity dihancurkan
         handler.removeCallbacks(updateTimeRunnable)
         DownloadFile.unregisterDownloadCompleteReceiver(this@TugasActivity)
-    }
-
-    private fun alertFail(string: String) {
-        AlertDialog.Builder(this@TugasActivity)
-            .setTitle("Failed")
-            .setIcon(R.drawable.ic_warning_24)
-            .setMessage(string)
-            .setPositiveButton("OK"
-            ) { dialog, _ -> dialog.dismiss() }
-            .show()
     }
 }

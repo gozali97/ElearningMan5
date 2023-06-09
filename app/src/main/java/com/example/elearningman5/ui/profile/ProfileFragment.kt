@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.elearningman5.*
 import com.example.elearningman5.databinding.FragmentProfileBinding
+import com.example.elearningman5.pelengkap.kode401
 import com.example.elearningman5.ui.profile.changepass.ChangePasswordActivity
 import com.example.elearningman5.ui.profile.editprofile.EditProfileActivity
 import com.squareup.picasso.Picasso
@@ -53,10 +54,7 @@ class ProfileFragment : Fragment() {
 
         binding.btnChangePassword.setOnClickListener {
             activity?.let{
-                it.startActivity(Intent (it, ChangePasswordActivity::class.java)
-                    .putExtra("id", id)
-                    .putExtra("email", email)
-                )
+                it.startActivity(Intent (it, ChangePasswordActivity::class.java))
             }
         }
 
@@ -65,23 +63,36 @@ class ProfileFragment : Fragment() {
             Thread {
                 val http = Http(context, url)
                 http.setMethod("post")
+                http.setToken(true)
                 http.send()
 
                 activity?.runOnUiThread {
                     val code = http.getStatusCode()
-                    if (code == 200) {
-                        try {
-                            localStorage.setEmail("")
-                            localStorage.setNis("")
-                            localStorage.setSesi("")
+                    val response = http.getResponse()?.let { JSONObject(it) }
+                    when (code) {
+                        200 -> {
+                            try {
+                                localStorage.setEmail("")
+                                localStorage.setNis("")
+                                localStorage.setSesi("")
+                                localStorage.setToken("")
+
+                                startActivity(Intent(context, MainActivity::class.java))
+                                requireActivity().finish()
+                            } catch (e: JSONException) {
+                                e.printStackTrace()
+                            }
+                        }
+                        401 -> {
+                            context?.let { it1 -> kode401(response!!.getString("message"), it1) }
+                            localStorage.setToken("")
 
                             startActivity(Intent(context, MainActivity::class.java))
                             requireActivity().finish()
-                        } catch (e: JSONException) {
-                            e.printStackTrace()
                         }
-                    } else {
-                        Toast.makeText(context, "Error $code", Toast.LENGTH_SHORT).show()
+                        else -> {
+                            Toast.makeText(context, "Error $code (${ response?.getString("message") })", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
 
@@ -93,7 +104,7 @@ class ProfileFragment : Fragment() {
 
     @Suppress("DEPRECATION")
     private fun openActivityForResult() {
-        val intent = Intent(activity, EditProfileActivity::class.java).putExtra("email", email)
+        val intent = Intent(activity, EditProfileActivity::class.java)
         startActivityForResult(intent, REQUEST_CODE)
     }
 
@@ -116,56 +127,59 @@ class ProfileFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     private fun getUser() {
-        val params = JSONObject()
-        try {
-            params.put("email", localStorage.getEmail().toString())
-        } catch (e: JSONException) {
-            e.printStackTrace()
-        }
-        val data = params.toString()
-        val url = getString(R.string.api_server) + "/profil"
+        val url = getString(R.string.api_server) + "/profile"
 
         Thread {
             val http = Http(context, url)
             http.setMethod("post")
-            http.setData(data)
+            http.setToken(true)
             http.send()
             activity?.runOnUiThread {
                 val code = http.getStatusCode()
-                if (code == 200) {
-                    try {
-                        val response =
-                            http.getResponse()?.let { JSONObject(it).getJSONObject("data") }
+                val response = http.getResponse()?.let { JSONObject(it) }
+                when (code) {
+                    200 -> {
+                        try {
+                            val dataProfile = response?.getJSONObject("data")
 
-                        Picasso.with(context)
-                            .load(getString(R.string.api_server)
-                                .replace("/api",
-                                    "/assets/img/${response?.getString("gambar")}"))
-                            .error(R.drawable.profile_user)
-                            .resize(300, 300)
-                            .centerCrop()
-                            .skipMemoryCache()
-                            .into(binding.recProfile)
+                            Picasso.with(context)
+                                .load(getString(R.string.api_server)
+                                    .replace("/api",
+                                        "/assets/img/${dataProfile?.getString("gambar")}"))
+                                .error(R.drawable.profile_user)
+                                .resize(300, 300)
+                                .centerCrop()
+                                .skipMemoryCache()
+                                .into(binding.recProfile)
 
-                        binding.textNama.text =
-                            "${response?.getString("name")
-                                ?.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }}"
-                        binding.textNis.text = "${ response?.getString("nis") }"
+                            binding.textNama.text =
+                                "${dataProfile?.getString("name")
+                                    ?.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }}"
+                            binding.textNis.text = "${ dataProfile?.getString("nis") }"
 
-                        id = response?.getString("id")
-                        email = response?.getString("email")
+                            id = dataProfile?.getString("id")
+                            email = dataProfile?.getString("email")
 
-                        binding.textEmailSiswa.text = "Email : $email"
-                        binding.textNoHp.text = "No. Hp : ${ response?.getString("no_hp") }"
+                            binding.textEmailSiswa.text = "Email : $email"
+                            binding.textNoHp.text = "No. Hp : ${ dataProfile?.getString("no_hp") }"
 
-                        binding.textKelas.text = "Kelas : ${ response?.getString("nama_kelas")?.uppercase() }"
-                        binding.textJurusan.text = "Jurusan : ${ response?.getString("nama_jurusan")?.uppercase() }"
-                        binding.textAlamat.text = response?.getString("alamat")
-                    } catch (e: JSONException) {
-                        e.printStackTrace()
+                            binding.textKelas.text = "Kelas : ${ dataProfile?.getString("nama_kelas")?.uppercase() }"
+                            binding.textJurusan.text = "Jurusan : ${ dataProfile?.getString("nama_jurusan")?.uppercase() }"
+                            binding.textAlamat.text = dataProfile?.getString("alamat")
+                        } catch (e: JSONException) {
+                            e.printStackTrace()
+                        }
                     }
-                } else {
-                    Toast.makeText(context, "Error $code", Toast.LENGTH_SHORT).show()
+                    401 -> {
+                        context?.let { it1 -> kode401(response!!.getString("message"), it1) }
+                        localStorage.setToken("")
+
+                        startActivity(Intent(context, MainActivity::class.java))
+                        requireActivity().finish()
+                    }
+                    else -> {
+                        Toast.makeText(context, "Error $code (${ response?.getString("message")})", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }.start()

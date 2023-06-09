@@ -23,9 +23,16 @@ class UTask(
     private var response: String? = null
     private var statusCode = 0
     private var fileName: String = "example.pdf"
+    private var token = false
+    private var localStorage: LocalStorage
 
     init {
         this.context = context
+        localStorage = LocalStorage(context)
+    }
+
+    fun setToken(token: Boolean) {
+        this.token = token
     }
 
     fun setDataFile(fileUri: Uri?) {
@@ -49,17 +56,26 @@ class UTask(
     }
 
     fun send() {
+        var connection: HttpURLConnection? = null
         try {
             // boundary untuk memisahkan setiap bagian dari permintaan
             val boundary = "----Boundary" + System.currentTimeMillis()
 
             // membuat permintaan
             val sUrl = URL(url)
-            val connection = sUrl.openConnection() as HttpURLConnection
+            connection = sUrl.openConnection() as HttpURLConnection
 
             connection.doOutput = true
             connection.requestMethod = "POST"
             connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=$boundary")
+
+            // mengatur header Authorization jika token tidak null
+            if (token) {
+                connection.setRequestProperty(
+                    "Authorization",
+                    "Bearer " + localStorage.getToken()
+                )
+            }
 
             // membuka stream keluaran untuk menulis ke permintaan
             val outputStream = DataOutputStream(connection.outputStream)
@@ -119,6 +135,9 @@ class UTask(
             response = sb.toString()
         } catch (e: IOException) {
             e.printStackTrace()
+        } finally {
+            // Disconnect koneksi setelah selesai
+            connection?.disconnect()
         }
     }
 }

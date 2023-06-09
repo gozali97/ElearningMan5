@@ -1,18 +1,19 @@
 package com.example.elearningman5
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.util.Patterns
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatTextView
 import com.example.elearningman5.databinding.ActivityLoginBinding
-import com.example.elearningman5.pelengkap.String2Date
-import com.example.elearningman5.pelengkap.alertFail
+import com.example.elearningman5.pelengkap.*
 import org.json.JSONException
 import org.json.JSONObject
 import java.time.LocalDateTime
@@ -46,7 +47,8 @@ class LoginActivity : AppCompatActivity() {
 
         if (localStorage.getEmail()?.isNotEmpty()!! &&
             localStorage.getNis()?.isNotEmpty()!! &&
-            localStorage.getSesi()?.isNotEmpty()!!
+            localStorage.getSesi()?.isNotEmpty()!! &&
+            localStorage.getToken()?.isNotEmpty()!!
         ) {
             dialog.show()
             if (LocalDateTime.now()
@@ -61,6 +63,7 @@ class LoginActivity : AppCompatActivity() {
                 localStorage.setEmail("")
                 localStorage.setNis("")
                 localStorage.setSesi("")
+                localStorage.setToken("")
                 dialog.dismiss()
                 Toast.makeText(this@LoginActivity, "Sessi anda sudah habis, silahkan login kembali", Toast.LENGTH_LONG).show()
             }
@@ -69,6 +72,21 @@ class LoginActivity : AppCompatActivity() {
         emailFocusListener()
         passwordFocusListener()
         binding.btnLogin.setOnClickListener { checkLogin(dialog) }
+
+        binding.root.setOnClickListener { view ->
+            if (
+                view.id != binding.txtEmail.id &&
+                view.id != binding.txtPassword.id &&
+                view.id != binding.btnLogin.id
+            ) {
+                val inputManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                val currentFocus = currentFocus
+
+                if (currentFocus != null) {
+                    inputManager.hideSoftInputFromWindow(currentFocus.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+                }
+            }
+        }
     }
 
 //    https://www.youtube.com/watch?v=Gc0sLf91QeM&t=4s
@@ -150,6 +168,7 @@ class LoginActivity : AppCompatActivity() {
 
                             localStorage.setEmail(response.getString("email"))
                             localStorage.setNis(response.getJSONObject("siswa").getString("nis"))
+                            localStorage.setToken(response.getJSONObject("siswa").getString("token"))
                             localStorage.setSesi(LocalDateTime.now().plusDays(5).format(formatter).toString())
 
                             startActivity(Intent(this@LoginActivity, UserActivity::class.java))
@@ -166,11 +185,11 @@ class LoginActivity : AppCompatActivity() {
                         }
                     }
                     401 -> {
-                        try {
-                            response?.let { alertFail(it.getString("message"), this@LoginActivity) }
-                        } catch (e: JSONException) {
-                            e.printStackTrace()
-                        }
+                        kode401(response!!.getString("message"), this)
+                        localStorage.setToken("")
+
+                        startActivity(Intent(this, MainActivity::class.java))
+                        finish()
                     }
                     else -> {
                         Log.d("TAG, sendLogin: ", code.toString())

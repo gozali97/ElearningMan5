@@ -1,6 +1,7 @@
 package com.example.elearningman5.ui.home.materi
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,8 +14,11 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.elearningman5.Http
+import com.example.elearningman5.LocalStorage
+import com.example.elearningman5.MainActivity
 import com.example.elearningman5.R
 import com.example.elearningman5.databinding.FragmentMateriBinding
+import com.example.elearningman5.pelengkap.kode401
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import org.json.JSONException
@@ -101,44 +105,53 @@ open class MateriFragment : Fragment() {
         Thread {
             val http = Http(context, url)
             http.setMethod("post")
+            http.setToken(true)
             http.setData(data)
             http.send()
 
             activity?.runOnUiThread {
                 dataList?.clear()
+                val res = http.getResponse()?.let { JSONObject(it) }
 
-                val code = http.getStatusCode()
-                if (code == 200) {
-                    try {
-                        val response =
-                            http.getResponse()?.let { JSONObject(it).getJSONArray("data").toString() }
+                when (val code = http.getStatusCode()) {
+                    200 -> {
+                        try {
+                            val response = res?.getJSONArray("data").toString()
 
-                        if (response!! == "[]") {
-                            Toast.makeText(context, "TIDAK ADA MATERI", Toast.LENGTH_SHORT).show()
-                            val navController = findNavController()
+                            if (response == "[]") {
+                                Toast.makeText(context, "TIDAK ADA MATERI", Toast.LENGTH_SHORT).show()
+                                val navController = findNavController()
 
-                            navController.run {
-                                onDestroyView()
-                                popBackStack()
-                                navigate(R.id.navigation_home)
+                                navController.run {
+                                    onDestroyView()
+                                    popBackStack()
+                                    navigate(R.id.navigation_home)
+                                }
+                            } else {
+                                val gson = Gson()
+                                val dataClass = object : TypeToken<ArrayList<DataMateriClass>>() {}.type
+
+                                val addData: ArrayList<DataMateriClass> = gson.fromJson(response, dataClass)
+
+                                dataList?.addAll(addData)
+                                adapter?.notifyDataSetChanged()
                             }
-                        } else {
-                            val gson = Gson()
-                            val dataClass = object : TypeToken<ArrayList<DataMateriClass>>() {}.type
-
-                            val addData: ArrayList<DataMateriClass> = gson.fromJson(response, dataClass)
-
-                            dataList?.addAll(addData)
-                            adapter?.notifyDataSetChanged()
+                        } catch (e: JSONException) {
+                            e.printStackTrace()
                         }
-                    } catch (e: JSONException) {
-                        e.printStackTrace()
                     }
-                    it.dismiss()
-                } else {
-                    it.dismiss()
-                    Toast.makeText(context, "Error $code", Toast.LENGTH_SHORT).show()
+                    401 -> {
+                        context?.let { it -> kode401(res!!.getString("message"), it) }
+                        LocalStorage(context).setToken("")
+
+                        startActivity(Intent(context, MainActivity::class.java))
+                        requireActivity().finish()
+                    }
+                    else -> {
+                        Toast.makeText(context, "Error $code (${ res!!.getString("message") })", Toast.LENGTH_SHORT).show()
+                    }
                 }
+                it.dismiss()
             }
         }.start()
     }

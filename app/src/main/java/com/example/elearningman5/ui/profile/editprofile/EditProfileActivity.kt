@@ -15,11 +15,10 @@ import android.provider.MediaStore
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import com.example.elearningman5.Http
-import com.example.elearningman5.R
-import com.example.elearningman5.UTask
+import com.example.elearningman5.*
 import com.example.elearningman5.databinding.ActivityEditProfileBinding
 import com.example.elearningman5.pelengkap.alertFail
+import com.example.elearningman5.pelengkap.kode401
 import com.squareup.picasso.Picasso
 import org.json.JSONException
 import org.json.JSONObject
@@ -164,50 +163,56 @@ class EditProfileActivity : AppCompatActivity() {
     private fun updateProfile() {
         val params = JSONObject()
         try {
-            params.put("email", intent.extras?.getString("email"))
             params.put("name", binding.txtNama.text)
             params.put("no_hp", binding.txtNoHP.text)
             params.put("alamat", binding.txtAlamat.text)
         } catch (e: JSONException) {
             e.printStackTrace()
         }
-        val url = getString(R.string.api_server) + "/profil/updateProfile"
+        val url = getString(R.string.api_server) + "/profile/updateProfile"
 
         Thread {
+            var response: JSONObject? = null
             val uploadTask = UTask(this@EditProfileActivity, url)
+
             uploadTask.setDataFile(fileUri)
             uploadTask.setFileName(fileName.toString())
             uploadTask.setDataKey(params.toString())
+            uploadTask.setToken(true)
             uploadTask.send()
 
             runOnUiThread {
-                val response = uploadTask.getResponse()?.let { JSONObject(it) }
-                when (val code = uploadTask.getStatusCode()) {
-                    200 -> {
-                        try {
-                            Toast.makeText(this@EditProfileActivity, "Profile berhasil diupdate", Toast.LENGTH_LONG).show()
-                            returnResultToFragment("refresh")
-                        } catch (e: JSONException) {
-                            e.printStackTrace()
+                try {
+                    response = uploadTask.getResponse()?.let { JSONObject(it) }
+                    when (val code = uploadTask.getStatusCode()) {
+                        200 -> {
+                            try {
+                                Toast.makeText(this@EditProfileActivity, "Profile berhasil diupdate", Toast.LENGTH_LONG).show()
+                                returnResultToFragment("refresh")
+                            } catch (e: JSONException) {
+                                e.printStackTrace()
+                            }
+                        }
+                        422 -> {
+                            try {
+                                response?.let { alertFail(it.getString("message"), this) }
+                            } catch (e: JSONException) {
+                                e.printStackTrace()
+                            }
+                        }
+                        401 -> {
+                            kode401(response!!.getString("message"), this)
+                            LocalStorage(this).setToken("")
+
+                            startActivity(Intent(this, MainActivity::class.java))
+                            finish()
+                        }
+                        else -> {
+                            Toast.makeText(this@EditProfileActivity, "Error $code (${ response?.getString("message") })", Toast.LENGTH_SHORT).show()
                         }
                     }
-                    422 -> {
-                        try {
-                            response?.let { alertFail(it.getString("message"), this) }
-                        } catch (e: JSONException) {
-                            e.printStackTrace()
-                        }
-                    }
-                    401 -> {
-                        try {
-                            response?.let { alertFail(it.getString("message"), this) }
-                        } catch (e: JSONException) {
-                            e.printStackTrace()
-                        }
-                    }
-                    else -> {
-                        Toast.makeText(this@EditProfileActivity, "Error $code, ${response?.getString("message")}", Toast.LENGTH_SHORT).show()
-                    }
+                } catch (e: JSONException) {
+                    e.printStackTrace()
                 }
             }
         }.start()
@@ -235,46 +240,49 @@ class EditProfileActivity : AppCompatActivity() {
     }
 
     private fun getProfile() {
-        val params = JSONObject()
-        try {
-            params.put("email", intent.extras?.getString("email"))
-        } catch (e: JSONException) {
-            e.printStackTrace()
-        }
-        val data = params.toString()
-        val url = getString(R.string.api_server) + "/profil"
+        val url = getString(R.string.api_server) + "/profile"
 
         Thread {
             val http = Http(this, url)
             http.setMethod("post")
-            http.setData(data)
+            http.setToken(true)
             http.send()
 
             runOnUiThread {
                 val code = http.getStatusCode()
-                if (code == 200) {
-                    try {
-                        val response =
-                            http.getResponse()?.let { JSONObject(it).getJSONObject("data") }
+                val response = http.getResponse()?.let { JSONObject(it) }
+                when (code) {
+                    200 -> {
+                        try {
+                            val dataProfile = response?.getJSONObject("data")
 
-                        Picasso.with(this)
-                            .load(getString(R.string.api_server)
-                                .replace("/api",
-                                    "/assets/img/${response?.getString("gambar")}"))
-                            .error(R.drawable.uploadimg)
-                            .resize(300, 300)
-                            .centerCrop()
-                            .skipMemoryCache()
-                            .into(binding.recProfile)
+                            Picasso.with(this)
+                                .load(getString(R.string.api_server)
+                                    .replace("/api",
+                                        "/assets/img/${dataProfile?.getString("gambar")}"))
+                                .error(R.drawable.uploadimg)
+                                .resize(300, 300)
+                                .centerCrop()
+                                .skipMemoryCache()
+                                .into(binding.recProfile)
 
-                        binding.txtNama.setText(response?.getString("name"))
-                        binding.txtNoHP.setText(response?.getString("no_hp"))
-                        binding.txtAlamat.setText(response?.getString("alamat"))
-                    } catch (e: JSONException) {
-                        e.printStackTrace()
+                            binding.txtNama.setText(dataProfile?.getString("name"))
+                            binding.txtNoHP.setText(dataProfile?.getString("no_hp"))
+                            binding.txtAlamat.setText(dataProfile?.getString("alamat"))
+                        } catch (e: JSONException) {
+                            e.printStackTrace()
+                        }
                     }
-                } else {
-                    Toast.makeText(this, "Error $code", Toast.LENGTH_SHORT).show()
+                    401 -> {
+                        kode401(response!!.getString("message"), this)
+                        LocalStorage(this).setToken("")
+
+                        startActivity(Intent(this, MainActivity::class.java))
+                        finish()
+                    }
+                    else -> {
+                        Toast.makeText(this, "Error $code (${ response?.getString("message") })", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }.start()
