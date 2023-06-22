@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.util.Patterns
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.ActionBar
@@ -27,6 +28,7 @@ class LoginActivity : AppCompatActivity() {
 
     private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
+    @Suppress("DEPRECATION")
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         supportActionBar?.apply {
@@ -36,6 +38,8 @@ class LoginActivity : AppCompatActivity() {
         findViewById<AppCompatTextView>(R.id.toolbarTitle).text = "Madrasah Aliyah Negeri 5 Sleman"
 
         super.onCreate(savedInstanceState)
+        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
+
         binding =  ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
         localStorage = LocalStorage(this@LoginActivity)
@@ -168,7 +172,8 @@ class LoginActivity : AppCompatActivity() {
 
                             localStorage.setEmail(response.getString("email"))
                             localStorage.setNis(response.getJSONObject("siswa").getString("nis"))
-                            localStorage.setToken(response.getJSONObject("siswa").getString("token"))
+//                            localStorage.setToken(response.getJSONObject("siswa").getString("token"))
+                            localStorage.setToken("cek")
                             localStorage.setSesi(LocalDateTime.now().plusDays(5).format(formatter).toString())
 
                             startActivity(Intent(this@LoginActivity, UserActivity::class.java))

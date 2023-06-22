@@ -1,6 +1,7 @@
 package com.example.elearningman5
 
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatTextView
@@ -17,8 +18,10 @@ class UserActivity : AppCompatActivity() {
     private lateinit var binding: ActivityUserBinding
     private var toolbarTitle: AppCompatTextView? = null
 
+    @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
 
         binding = ActivityUserBinding.inflate(layoutInflater)
         setContentView(binding.root)

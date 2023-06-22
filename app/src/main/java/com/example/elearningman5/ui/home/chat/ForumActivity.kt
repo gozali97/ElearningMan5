@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
@@ -54,6 +55,7 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
     private var isYesteday = true
     private var isToday = true
 
+    @Suppress("DEPRECATION")
     @SuppressLint("MissingInflatedId", "SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         supportActionBar?.apply {
@@ -65,6 +67,7 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
         findViewById<AppCompatTextView>(R.id.toolbarTitle).text = "Forum Diskusi (${intent.extras?.getString("nama_materi")})"
 
         super.onCreate(savedInstanceState)
+        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContentView(R.layout.activity_forum)
 
         localStorage = LocalStorage(this@ForumActivity)

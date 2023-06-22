@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.provider.OpenableColumns
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -58,6 +59,7 @@ class TugasActivity : AppCompatActivity() {
             "Tugas ${intent.extras?.getString("nama_materi")}"
 
         super.onCreate(savedInstanceState)
+        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContentView(R.layout.activity_tugas)
 
         localStorage = LocalStorage(this@TugasActivity)
