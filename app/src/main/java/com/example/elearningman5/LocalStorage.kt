@@ -2,6 +2,7 @@ package com.example.elearningman5
 
 import android.content.Context
 import android.content.SharedPreferences
+import org.json.JSONObject
 
 class LocalStorage(context: Context?) {
     private var sharedPreferences: SharedPreferences =
@@ -11,6 +12,7 @@ class LocalStorage(context: Context?) {
     private var email: String? = null
     private var nis: String? = null
     private var sesiBerakhir: String? = null
+    private var jsonSubTopic: JSONObject = JSONObject()
 
     fun getToken(): String? {
         return sharedPreferences.getString("access_token", "")
@@ -47,5 +49,30 @@ class LocalStorage(context: Context?) {
     fun setSesi(sesi_berakhir: String) {
         editor.putString("sesiBerakhir", sesi_berakhir).commit()
         this.sesiBerakhir = sesi_berakhir
+    }
+
+    fun getJsonSubTopic(): JSONObject {
+        val jsonStr = sharedPreferences.getString("jsonSubTopic", null)
+        return if (jsonStr != null) {
+            JSONObject(jsonStr)
+        } else {
+            JSONObject()
+        }
+    }
+
+    fun setJsonSubTopic(json: JSONObject) {
+        editor.putString("jsonSubTopic", json.toString()).commit()
+        jsonSubTopic = json
+    }
+
+    fun removeDataFromJsonSubTopic(key: String) {
+        val json = getJsonSubTopic()
+        json.remove(key)
+        setJsonSubTopic(json)
+    }
+
+    fun clearJsonSubTopic() {
+        editor.remove("jsonSubTopic").commit()
+        jsonSubTopic = JSONObject()
     }
 }

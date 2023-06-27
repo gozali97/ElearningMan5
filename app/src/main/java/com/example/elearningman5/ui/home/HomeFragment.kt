@@ -18,7 +18,6 @@ import com.example.elearningman5.MainActivity
 import com.example.elearningman5.R
 import com.example.elearningman5.databinding.FragmentHomeBinding
 import com.example.elearningman5.pelengkap.kode401
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -62,22 +61,21 @@ class HomeFragment : Fragment() {
         dialog?.show()
 
         dataList = ArrayList()
-        adapter =  parentFragment?.let { MyAdapter(dataList, it) }
+        adapter =  this.context?.let { it1 -> parentFragment?.let { MyAdapter(it1, dataList, it) } }
         recyclerView.adapter = adapter
         dialog?.show()
 
         dialog?.let { getDataMapel(it) }
-        getTokenNotif()
+//        getTokenNotify() // * untuk mendapatkan token device
         //////////////////
 
         return root
     }
 
-    private fun getTokenNotif() {
-        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+    private fun getTokenNotify() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Log.w("Fetching FCM registration token failed", task.exception)
-                return@OnCompleteListener
             }
 
             // Get new FCM registration token
@@ -85,7 +83,7 @@ class HomeFragment : Fragment() {
 
             // Log and toast
             Log.d("TAG TOKEN", token.toString())
-        })
+        }
     }
 
     override fun onDestroyView() {

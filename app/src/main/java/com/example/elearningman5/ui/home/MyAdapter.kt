@@ -1,6 +1,7 @@
 package com.example.elearningman5.ui.home
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,11 +15,12 @@ import com.example.elearningman5.firebase.FirebaseMessagingHelper
 import com.example.elearningman5.ui.home.materi.MateriFragment
 
 
-class MyAdapter(dataList: ArrayList<DataClass>,
+class MyAdapter(context: Context,
+                dataList: ArrayList<DataClass>,
                 private var fa: Fragment
 ) : RecyclerView.Adapter<MyViewHolder>() {
     private var dataList: ArrayList<DataClass>
-    private var firebaseMessagingHelper: FirebaseMessagingHelper = FirebaseMessagingHelper()
+    private var firebaseMessagingHelper: FirebaseMessagingHelper = FirebaseMessagingHelper(context)
 
     init {
         this.dataList = dataList

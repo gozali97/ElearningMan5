@@ -8,7 +8,6 @@ class DataClass(
 //    private var dataImage: String?
 ) {
 
-    // untuk hapus data/edit
     fun getKey(): String? {
         return kode_jadwal
     }

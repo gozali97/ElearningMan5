@@ -16,10 +16,4 @@
         android:name="com.example.elearningman5.ui.profile.ProfileFragment"
         android:label="@string/title_dashboard"
         tools:layout="@layout/fragment_profile" />
-
-    <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.example.elearningman5.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
 </navigation>
