@@ -29,7 +29,7 @@ class LoginActivity : AppCompatActivity() {
     private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
     @Suppress("DEPRECATION")
-    @SuppressLint("MissingInflatedId")
+    @SuppressLint("MissingInflatedId", "SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         supportActionBar?.apply {
             displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
@@ -172,8 +172,7 @@ class LoginActivity : AppCompatActivity() {
 
                             localStorage.setEmail(response.getString("email"))
                             localStorage.setNis(response.getJSONObject("siswa").getString("nis"))
-//                            localStorage.setToken(response.getJSONObject("siswa").getString("token"))
-                            localStorage.setToken("cek")
+                            localStorage.setToken(response.getJSONObject("siswa").getString("token"))
                             localStorage.setSesi(LocalDateTime.now().plusDays(5).format(formatter).toString())
 
                             startActivity(Intent(this@LoginActivity, UserActivity::class.java))

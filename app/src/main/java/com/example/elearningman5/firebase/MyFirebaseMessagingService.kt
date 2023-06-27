@@ -1,18 +1,19 @@
 package com.example.elearningman5.firebase
 
-import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.media.RingtoneManager
-import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
+import androidx.work.Worker
+import androidx.work.WorkerParameters
 import com.example.elearningman5.R
-import com.example.elearningman5.UserActivity
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
@@ -24,24 +25,23 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
         Log.d(TAG, "From: ${remoteMessage.from}")
 
-//        // Check if message contains a data payload.
-//        if (remoteMessage.data.isNotEmpty()) {
-//            Log.d(TAG, "Message data payload: ${remoteMessage.data}")
-//
-//            // Check if data needs to be processed by long running job
-//            if (needsToBeScheduled()) {
-//                // For long-running tasks (10 seconds or more) use WorkManager.
-//                scheduleJob()
-//            } else {
-//                // Handle message within 10 seconds
-//                handleNow()
-//            }
-//        }
+        // Check if message contains a data payload.
+        if (remoteMessage.data.isNotEmpty()) {
+            Log.d(TAG, "Message data payload: ${remoteMessage.data}")
+
+            // Check if data needs to be processed by long running job
+            if (needsToBeScheduled()) {
+                // For long-running tasks (10 seconds or more) use WorkManager.
+                scheduleJob()
+            } else {
+                // Handle message within 10 seconds
+                handleNow()
+            }
+        }
 
         // Check if message contains a notification payload.
         remoteMessage.notification?.let {
-            Log.d(TAG, "Message Notification Body: ${it.imageUrl}")
-            sendNotification(it.title.toString(), it.body.toString())
+            Log.d(TAG, "Message Notification Body: ${it.body}")
         }
 
         // Also if you intend on generating your own notifications as a result of a received FCM
@@ -67,15 +67,15 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
     // [END on_new_token]
 
-//    private fun scheduleJob() {
-//        // [START dispatch_job]
-//        val work = OneTimeWorkRequest.Builder(MyWorker::class.java)
-//            .build()
-//        WorkManager.getInstance(this)
-//            .beginWith(work)
-//            .enqueue()
-//        // [END dispatch_job]
-//    }
+    private fun scheduleJob() {
+        // [START dispatch_job]
+        val work = OneTimeWorkRequest.Builder(MyWorker::class.java)
+            .build()
+        WorkManager.getInstance(this)
+            .beginWith(work)
+            .enqueue()
+        // [END dispatch_job]
+    }
 
     private fun handleNow() {
         Log.d(TAG, "Short lived task is done.")
@@ -86,9 +86,9 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         Log.d(TAG, "sendRegistrationTokenToServer($token)")
     }
 
-    @SuppressLint("ObsoleteSdkInt")
-    private fun sendNotification(title: String, messageBody: String) {
-        val intent = Intent(this, UserActivity::class.java)
+    // digunakan untuk inisialisasi notiifikasi
+    private fun sendNotification(title: String, messageBody: String, context: Context) {
+        val intent = Intent(this, context::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         val requestCode = 0
         val pendingIntent = PendingIntent.getActivity(
@@ -128,10 +128,10 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         private const val TAG = "MyFirebaseMsgService"
     }
 
-//    internal class MyWorker(appContext: Context, workerParams: WorkerParameters) : Worker(appContext, workerParams) {
-//        override fun doWork(): Result {
-//            // TODO(developer): add long running task here.
-//            return Result.success()
-//        }
-//    }
+    internal class MyWorker(appContext: Context, workerParams: WorkerParameters) : Worker(appContext, workerParams) {
+        override fun doWork(): Result {
+            // TODO(developer): add long running task here.
+            return Result.success()
+        }
+    }
 }

@@ -2,6 +2,7 @@ package com.example.elearningman5.ui.home.materi
 
 class DataMateriClass (
     private var id_materi: String?,
+    private var jadwal_id: String?,
     private var nama_materi: String?,
     private var deskripsi: String?,
     private var path_file: String?,
@@ -12,6 +13,11 @@ class DataMateriClass (
     fun getKeyMateri(): String? {
         return id_materi
     }
+
+    fun getKeyNotif(): String? {
+        return jadwal_id
+    }
+
     fun getKeyTugas(): String? {
         return id_tugas
     }

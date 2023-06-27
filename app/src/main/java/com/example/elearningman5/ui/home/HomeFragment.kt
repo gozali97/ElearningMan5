@@ -62,7 +62,7 @@ class HomeFragment : Fragment() {
         dialog?.show()
 
         dataList = ArrayList()
-        adapter = context?.let { parentFragment?.let { it1 -> MyAdapter(it, dataList, it1) } }
+        adapter =  parentFragment?.let { MyAdapter(dataList, it) }
         recyclerView.adapter = adapter
         dialog?.show()
 
@@ -85,7 +85,6 @@ class HomeFragment : Fragment() {
 
             // Log and toast
             Log.d("TAG TOKEN", token.toString())
-            Toast.makeText(context, token, Toast.LENGTH_SHORT).show()
         })
     }
 

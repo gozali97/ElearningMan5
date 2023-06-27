@@ -48,7 +48,7 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
 
     private var retryAttempts = 1
     private val maxRetryAttempts = 4
-    private var initialBackoffDelay = 1000L // 1 second
+    private var initialBackoffDelay = 1000L // 1 second // * pada server 1s, local 2s
     private val handler = Handler()
 
     private var cekUpdate = false
@@ -140,11 +140,11 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
                             try {
                                 if (response?.getJSONArray("data").toString() != "[]") {
                                     for (i in 0 until (response?.getJSONArray("data")?.length() ?: 0)) {
+                                        keyMessage = response?.getJSONArray("data")?.getJSONObject(i)!!.getString("id_diskusi").toInt()
                                         val item = response?.getJSONArray("data")?.getJSONObject(i)
                                         cekUpdate = true
 
-                                        keyMessage = item!!.getString("id_diskusi").toInt()
-                                        val waktu = utcToWib(item.getString("created_at"))
+                                        val waktu = utcToWib(item!!.getString("created_at"))
 
                                         if(waktu!!.before(lusa)) {
                                             if (cekAwal) {
@@ -287,6 +287,8 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
         try {
             paramsForum.put("materi_id", intent.extras?.getString("key_chat"))
             paramsForum.put("isi_pesan", txtMessage.text.toString())
+            paramsForum.put("jadwal_id", intent.extras?.getString("key_notif"))
+            paramsForum.put("nama_materi", intent.extras?.getString("nama_materi"))
         } catch (e: JSONException) {
             e.printStackTrace()
         }

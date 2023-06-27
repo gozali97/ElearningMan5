@@ -1,7 +1,6 @@
 package com.example.elearningman5.ui.home
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,14 +10,15 @@ import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.example.elearningman5.R
+import com.example.elearningman5.firebase.FirebaseMessagingHelper
 import com.example.elearningman5.ui.home.materi.MateriFragment
 
 
-class MyAdapter(private val context: Context,
-                dataList: ArrayList<DataClass>,
+class MyAdapter(dataList: ArrayList<DataClass>,
                 private var fa: Fragment
 ) : RecyclerView.Adapter<MyViewHolder>() {
     private var dataList: ArrayList<DataClass>
+    private var firebaseMessagingHelper: FirebaseMessagingHelper = FirebaseMessagingHelper()
 
     init {
         this.dataList = dataList
@@ -36,6 +36,8 @@ class MyAdapter(private val context: Context,
         holder.recKelas.text = dataList[position].getKelas()
         holder.recMapel.text = dataList[position].getMapel()
         holder.recGuru.text = dataList[position].getGuru()
+
+        firebaseMessagingHelper.subscribeTopics(dataList[position].getKey()!!)
 
         holder.recCard.setOnClickListener {
             val arguments = Bundle()

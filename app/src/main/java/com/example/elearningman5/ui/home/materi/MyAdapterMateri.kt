@@ -76,6 +76,7 @@ class MyAdapterMateri(
                 it.startActivity(Intent (it, ForumActivity::class.java)
                     .putExtra("key_chat", dataList[holder.adapterPosition].getKeyMateri())
                     .putExtra("nama_materi", dataList[holder.adapterPosition].getMateri())
+                    .putExtra("key_notif", dataList[holder.adapterPosition].getKeyNotif())
                 )
             }
         }
