@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +11,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.elearningman5.*
 import com.example.elearningman5.databinding.FragmentProfileBinding
+import com.example.elearningman5.firebase.FirebaseMessagingHelper
 import com.example.elearningman5.pelengkap.kode401
 import com.example.elearningman5.ui.profile.changepass.ChangePasswordActivity
 import com.example.elearningman5.ui.profile.editprofile.EditProfileActivity
@@ -77,6 +77,13 @@ class ProfileFragment : Fragment() {
                                 localStorage.setSesi("")
                                 localStorage.setToken("")
 
+                                val firebaseMessagingHelper = context?.let { it1 ->
+                                    FirebaseMessagingHelper(
+                                        it1
+                                    )
+                                }
+                                firebaseMessagingHelper?.unsubscribeTopics()
+
                                 startActivity(Intent(context, MainActivity::class.java))
                                 requireActivity().finish()
                             } catch (e: JSONException) {
@@ -114,7 +121,6 @@ class ProfileFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             // Tangkap data dari activity dan lakukan pemrosesan sesuai kebutuhan
-            Log.d("TAG, onActivityResult: ", data?.getStringExtra("result_key").toString())
             if (data?.getStringExtra("result_key").toString() == "refresh")
                 getUser()
         }

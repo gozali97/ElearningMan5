@@ -30,7 +30,7 @@ class MessageAdapter (private val context: Context) : RecyclerView.Adapter<Messa
     }
 
     fun setItemClickListener(listener: ItemClickListener) {
-        itemClickListener = listener
+        this.itemClickListener = listener
     }
 
     override fun getItemCount(): Int {

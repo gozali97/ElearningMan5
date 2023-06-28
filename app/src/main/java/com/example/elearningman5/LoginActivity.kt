@@ -14,6 +14,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatTextView
 import com.example.elearningman5.databinding.ActivityLoginBinding
+import com.example.elearningman5.firebase.FirebaseMessagingHelper
 import com.example.elearningman5.pelengkap.*
 import org.json.JSONException
 import org.json.JSONObject
@@ -68,6 +69,10 @@ class LoginActivity : AppCompatActivity() {
                 localStorage.setNis("")
                 localStorage.setSesi("")
                 localStorage.setToken("")
+
+                val firebaseMessagingHelper = FirebaseMessagingHelper(this)
+                firebaseMessagingHelper.unsubscribeTopics()
+
                 dialog.dismiss()
                 Toast.makeText(this@LoginActivity, "Sessi anda sudah habis, silahkan login kembali", Toast.LENGTH_LONG).show()
             }

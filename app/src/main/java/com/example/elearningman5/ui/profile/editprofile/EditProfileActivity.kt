@@ -3,7 +3,6 @@ package com.example.elearningman5.ui.profile.editprofile
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -79,13 +78,21 @@ class EditProfileActivity : AppCompatActivity() {
         val alertDialog = AlertDialog.Builder(this@EditProfileActivity)
 
         alertDialog.setTitle("Select Image")
-        alertDialog.setItems(choice, DialogInterface.OnClickListener { dialog, item ->
+        alertDialog.setItems(choice) { dialog, item ->
             when {
                 // Select "Choose from Gallery" to pick image from gallery
                 choice[item] == "Choose from Gallery" -> {
-                    val pickFromGallery = Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                    val pickFromGallery = Intent(
+                        Intent.ACTION_GET_CONTENT,
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                    )
                     pickFromGallery.type = "image/*"
-                    startActivityForResult(Intent.createChooser(pickFromGallery, "Choose from Gallery"), 1)
+                    startActivityForResult(
+                        Intent.createChooser(
+                            pickFromGallery,
+                            "Choose from Gallery"
+                        ), 1
+                    )
                 }
                 // Select "Take Photo" to take a photo
                 choice[item] == "Take Photo" -> {
@@ -97,7 +104,7 @@ class EditProfileActivity : AppCompatActivity() {
                     dialog.dismiss()
                 }
             }
-        })
+        }
         alertDialog.show()
     }
 
@@ -175,7 +182,7 @@ class EditProfileActivity : AppCompatActivity() {
         val url = getString(R.string.api_server) + "/profile/updateProfile"
 
         Thread {
-            var response: JSONObject? = null
+            var response: JSONObject?
             val uploadTask = UTask(this@EditProfileActivity, url)
 
             uploadTask.setDataFile(fileUri)
@@ -299,8 +306,8 @@ class EditProfileActivity : AppCompatActivity() {
         val hp = binding.noHpContainer.helperText == null
 
         if (nama && hp) {
-//            updateProfile()
-            alertFail("Fungsi belum diaktifkan", this@EditProfileActivity)
+            updateProfile()
+//            alertFail("Fungsi belum diaktifkan", this@EditProfileActivity)
         } else {
             alertFail("Tolong dicek kembali", this@EditProfileActivity)
         }

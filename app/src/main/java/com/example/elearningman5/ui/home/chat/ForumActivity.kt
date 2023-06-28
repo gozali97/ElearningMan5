@@ -30,6 +30,7 @@ import java.time.*
 import java.util.*
 
 
+@Suppress("DEPRECATION")
 class ForumActivity : AppCompatActivity(), ItemClickListener {
     private lateinit var localStorage: LocalStorage
     private lateinit var adapter: MessageAdapter
@@ -55,7 +56,6 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
     private var isYesteday = true
     private var isToday = true
 
-    @Suppress("DEPRECATION")
     @SuppressLint("MissingInflatedId", "SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         supportActionBar?.apply {

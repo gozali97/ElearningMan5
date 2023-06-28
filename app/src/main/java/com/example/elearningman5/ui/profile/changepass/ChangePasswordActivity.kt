@@ -60,8 +60,8 @@ class ChangePasswordActivity : AppCompatActivity() {
         val validConfirmPassword = binding.confirmPasswordContainer.helperText == null
 
         if (validOldPassword && validNewPassword && validConfirmPassword) {
-//            updatePassword()
-            alertFail("Fungsi belum diaktifkan", this@ChangePasswordActivity)
+            updatePassword()
+//            alertFail("Fungsi belum diaktifkan", this@ChangePasswordActivity)
         } else {
             alertFail("Tolong dicek kembali", this@ChangePasswordActivity)
         }

@@ -31,7 +31,7 @@ class FirebaseMessagingHelper(context: Context) {
     private fun unsubscribe(topic: String) {
         FirebaseMessaging.getInstance().unsubscribeFromTopic(topic)
             .addOnCompleteListener { task ->
-                var msg = ""
+                val msg: String
                 if (!task.isSuccessful) {
                     msg = "Unsubscribe to topic $topic failed"
                 } else {
