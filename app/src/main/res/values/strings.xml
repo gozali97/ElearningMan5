@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">E-learning Man 5</string>
-    <string name="api_server">http://192.168.101.91:8000/api</string>
+    <string name="api_server">http://adiwebelearning.my.id/api</string>
     <!--
  http://adiwebelearning.my.id
  http://192.168.101.95:8000

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "451206166571",
+    "project_id": "notifikasi-elearning",
+    "storage_bucket": "notifikasi-elearning.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:451206166571:android:d4368e1178e5668a47d26e",
+        "android_client_info": {
+          "package_name": "com.example.elearningman5"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "451206166571-nlibtbauols6fvju1686kg024etqj3j3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfMdA833feri6kf_aolOYK8AhbtOhwh08"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "451206166571-nlibtbauols6fvju1686kg024etqj3j3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
