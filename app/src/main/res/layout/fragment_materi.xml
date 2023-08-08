@@ -8,10 +8,11 @@
     tools:context=".ui.home.materi.MateriFragment">
 
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_tugas"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/recycler_view_tugas"
-            android:scrollbars="none"/>
+            android:scrollbars="none"
+            android:background="@color/background" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/arrow_back"

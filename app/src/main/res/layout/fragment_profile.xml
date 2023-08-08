@@ -64,7 +64,7 @@
                         android:fontFamily="@font/proxima_nova_reg"
                         android:text="@string/nama_siswa"
                         android:maxLength="25"
-                        android:textColor="#424242"
+                        android:textColor="@color/black"
                         android:textSize="21sp"
                         android:textStyle="bold" />
 
@@ -73,6 +73,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/proxima_nova_reg"
+                        android:textColor="@color/black"
                         android:text="NIS"
                         android:textSize="14sp" />
 
@@ -160,6 +161,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Profile"
+                        android:textColor="@color/black"
                         android:textSize="17sp"
                         android:textAllCaps="true"
                         android:fontFamily="@font/proxima_nova_reg"
@@ -176,6 +178,7 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="5dp"
                         android:clickable="true"
+                        app:cardBackgroundColor="@color/lightgrey"
                         android:foreground="?android:attr/selectableItemBackground"
                         app:cardCornerRadius="50dp"
                         app:cardElevation="2dp">

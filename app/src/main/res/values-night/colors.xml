@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#D9FFFFFF</color>
+    <color name="white">#D83F3F3F</color>
+    <color name="red">#B7FA3939</color>
+    <color name="transparent">#00000000</color>
+    <color name="goodgrey">#D9FFFFFF</color>
+    <color name="blue">#8099CF</color>
+
+    <color name="background">#C6888686</color>
+    <color name="rounded_profile">#D9919BB1</color>
+    <color name="materi">#AE5D6468</color>
+</resources>

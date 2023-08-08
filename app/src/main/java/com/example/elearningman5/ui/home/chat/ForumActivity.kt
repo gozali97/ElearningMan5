@@ -64,7 +64,7 @@ class ForumActivity : AppCompatActivity(), ItemClickListener {
             setDisplayHomeAsUpEnabled(true)
             setHomeAsUpIndicator(R.drawable.baseline_arrow_back_24)
         }
-        findViewById<AppCompatTextView>(R.id.toolbarTitle).text = "Forum Diskusi (${intent.extras?.getString("nama_materi")})"
+        findViewById<AppCompatTextView>(R.id.toolbarTitle).text = "Forum Diskusi\n(${intent.extras?.getString("nama_materi")})"
 
         super.onCreate(savedInstanceState)
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)

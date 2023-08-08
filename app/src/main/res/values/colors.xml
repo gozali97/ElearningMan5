@@ -19,4 +19,7 @@
 
     <color name="green">#00ff00</color>
     <color name="background">#52C8C8C8</color>
+    <color name="border">#4fa5d5</color>
+    <color name="rounded_profile">#293859</color>
+    <color name="materi">#AEE3F2FD</color>
 </resources>
